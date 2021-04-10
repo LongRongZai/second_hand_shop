@@ -6,6 +6,7 @@ import com.shop.bean.UserBean;
 import com.shop.dao.mapperDao.CommodityMapper;
 import com.shop.dao.mapperDao.UserMapper;
 import com.shop.evt.ReleaseCommEvt;
+import com.shop.exceptions.CommReleaseException;
 import com.shop.model.CommModel;
 import com.shop.model.PluploadModel;
 import com.shop.model.ServiceRespModel;
@@ -15,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -73,6 +76,7 @@ public class CommodityService {
     /**
      * 发布商品
      */
+    @Transactional(rollbackFor = Exception.class)
     public ServiceRespModel releaseComm(ReleaseCommEvt evt, HttpServletRequest request) throws Exception {
         //校验用户状态
         UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
@@ -109,41 +113,46 @@ public class CommodityService {
             }
         }
         //将商品信息存至数据库
-        CommodityBean addComm = new CommodityBean();
-        String commNo = StringUtils.replace(UUID.randomUUID().toString(), "-", "");
-        addComm.setCommNo(commNo);
-        addComm.setCommName(evt.getCommName());
-        addComm.setCommDesc(evt.getCommDesc());
-        addComm.setCommPrice(evt.getCommPrice());
-        addComm.setCommStock(evt.getCommStock());
-        addComm.setCommTag(evt.getCommTag());
-        addComm.setCommSale(0);
-        addComm.setCreateUser((String) request.getAttribute("userNo"));
-        if (evt.getMultipartFileList() != null) {
-            int flag = 0;
-            for (MultipartFile file : evt.getMultipartFileList()) {
-                PluploadModel pluploadModel = UploadFileTool.upload(file, attachSavePath, attachViewPath);
-                CommPicBean addCommPic = new CommPicBean();
-                addCommPic.setCommPicNo(StringUtils.replace(UUID.randomUUID().toString(), "-", ""));
-                addCommPic.setCommNo(commNo);
-                addCommPic.setPictureUrl(pluploadModel.getViewPath());
-                addCommPic.setCreateUser((String) request.getAttribute("userNo"));
-                int info1 = commodityMapper.insertCommPic(addCommPic);
-                if (info1 == 1) {
-                    flag++;
+        try {
+            CommodityBean addComm = new CommodityBean();
+            String commNo = StringUtils.replace(UUID.randomUUID().toString(), "-", "");
+            addComm.setCommNo(commNo);
+            addComm.setCommName(evt.getCommName());
+            addComm.setCommDesc(evt.getCommDesc());
+            addComm.setCommPrice(evt.getCommPrice());
+            addComm.setCommStock(evt.getCommStock());
+            addComm.setCommTag(evt.getCommTag());
+            addComm.setCommSale(0);
+            addComm.setCreateUser((String) request.getAttribute("userNo"));
+            if (evt.getMultipartFileList() != null) {
+                int flag = 0;
+                for (MultipartFile file : evt.getMultipartFileList()) {
+                    PluploadModel pluploadModel = UploadFileTool.upload(file, attachSavePath, attachViewPath);
+                    CommPicBean addCommPic = new CommPicBean();
+                    addCommPic.setCommPicNo(StringUtils.replace(UUID.randomUUID().toString(), "-", ""));
+                    addCommPic.setCommNo(commNo);
+                    addCommPic.setPictureUrl(pluploadModel.getViewPath());
+                    addCommPic.setCreateUser((String) request.getAttribute("userNo"));
+                    int info1 = commodityMapper.insertCommPic(addCommPic);
+                    if (info1 == 1) {
+                        flag++;
+                    }
+                }
+                if (evt.getMultipartFileList().size() != flag) {
+                    throw new CommReleaseException("商品图片上传失败");
                 }
             }
-            if (evt.getMultipartFileList().size() != flag) {
-                return new ServiceRespModel(-1, "商品图片上传失败", null);
+            int info = commodityMapper.releaseComm(addComm);
+            if (info != 1) {
+                logger.info(String.format("用户%s发布一件商品", request.getAttribute("userEmail")));
+                throw new CommReleaseException("商品发布失败");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ServiceRespModel(-1, e.getMessage(), null);
         }
-        int info = commodityMapper.releaseComm(addComm);
-        if (info == 1) {
-            logger.info(String.format("用户%s发布一件商品", request.getAttribute("userEmail")));
-            return new ServiceRespModel(1, "商品发布成功", null);
-        }
-
-        return new ServiceRespModel(-1, "商品发布失败", null);
+        return new ServiceRespModel(1, "商品发布成功", null);
     }
 
     /**

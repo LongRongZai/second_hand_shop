@@ -50,7 +50,6 @@ public interface CommodityMapper {
     @Select("select * from t_commodity where status = 'E' and commNo = #{item}")
     CommodityBean queryCommByNo(@Param("item") String commNo);
 
-
     /**
      * 插入商品图片
      */
