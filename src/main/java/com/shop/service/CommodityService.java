@@ -147,7 +147,7 @@ public class CommodityService {
                 logger.info(String.format("用户%s发布一件商品", request.getAttribute("userEmail")));
                 throw new CommReleaseException("商品发布失败");
             }
-        } catch (Exception e) {
+        } catch (CommReleaseException e) {
             e.printStackTrace();
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ServiceRespModel(-1, e.getMessage(), null);

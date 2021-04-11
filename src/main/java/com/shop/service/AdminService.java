@@ -7,12 +7,15 @@ import com.shop.dao.mapperDao.CommodityMapper;
 import com.shop.dao.mapperDao.UserMapper;
 import com.shop.evt.AuditCommEvt;
 import com.shop.evt.SetUserIsBanEvt;
+import com.shop.exceptions.AuditCommException;
 import com.shop.model.CommModel;
 import com.shop.model.ServiceRespModel;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +39,7 @@ public class AdminService {
     /**
      * 商品审核
      */
+    @Transactional(rollbackFor = Exception.class)
     public ServiceRespModel auditComm(HttpServletRequest request, AuditCommEvt evt) {
         //校验用户权限
         UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
@@ -48,9 +52,6 @@ public class AdminService {
         if (StringUtils.isBlank(evt.getCommNo())) {
             return new ServiceRespModel(-1, "商品编码不能为空", null);
         }
-        if (StringUtils.isBlank(evt.getAuditor())) {
-            return new ServiceRespModel(-1, "审核人不能为空", null);
-        }
         if (evt.getAuditStatus() == null) {
             return new ServiceRespModel(-1, "审核状态不能为空", null);
         }
@@ -62,19 +63,25 @@ public class AdminService {
         if (commodityBean == null) {
             return new ServiceRespModel(-1, "商品不存在", null);
         }
-        //更新用户不合格商品数
-        if (evt.getAuditStatus() == 2) {
-            int info1 = adminMapper.updateUserUnquaComm(commodityBean.getCreateUser());
-            if (info1 != 1) {
-                return new ServiceRespModel(-1, "更新用户不合格商品数失败", null);
+        try {
+            //更新用户不合格商品数
+            if (evt.getAuditStatus() == 2) {
+                int info1 = adminMapper.updateUserUnquaComm(commodityBean.getCreateUser());
+                if (info1 != 1) {
+                    throw new AuditCommException("更新用户不合格商品数失败");
+                }
             }
+            //修改商品审核状态
+            int info = adminMapper.auditComm(evt, (String) request.getAttribute("userName"));
+            if (info != 1) {
+                throw new AuditCommException("商品审核失败");
+            }
+        } catch (AuditCommException e) {
+            e.printStackTrace();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ServiceRespModel(-1, e.getMessage(), null);
         }
-        //修改商品审核状态
-        int info = adminMapper.auditComm(evt);
-        if (info == 1) {
-            return new ServiceRespModel(1, "商品审核成功", null);
-        }
-        return new ServiceRespModel(-1, "商品审核失败", null);
+        return new ServiceRespModel(1, "商品审核成功", null);
     }
 
     /**

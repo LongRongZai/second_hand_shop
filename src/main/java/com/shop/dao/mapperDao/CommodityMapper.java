@@ -75,4 +75,10 @@ public interface CommodityMapper {
     @Select("select commName, commNo, auditStatus, createTime from t_commodity where status = 'E' and createUser = #{item}")
     List<CommodityBean> queryUserComm(@Param("item") String userNo);
 
+    /**
+     * 更新商品销量
+     */
+    @Update("update t_commodity set commSale = commSale + #{num} where commNo = #{commNo} and status = 'E'")
+    Integer updateCommSale(@Param("num") Integer num, @Param("commNo") String commNo);
+
 }

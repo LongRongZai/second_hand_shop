@@ -31,6 +31,9 @@ public class OrderBean {
     //购买数量
     @Column(name = "num", length = 128, nullable = false)
     private Integer num;
+    //价格
+    @Column(name = "price", length = 128, nullable = false)
+    private Integer price;
     //订单状态(0 待发货(未发货),1 待收货(已发货),2 完成,3 申请取消,4 订单取消)
     @Column(name = "orderStatus", length = 128, nullable = false)
     private Integer orderStatus;

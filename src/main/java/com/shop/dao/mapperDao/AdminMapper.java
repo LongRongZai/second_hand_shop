@@ -19,8 +19,8 @@ public interface AdminMapper {
     /**
      * 商品审核
      */
-    @Update("update t_commodity set auditStatus = #{item.auditStatus}, auditor = #{item.auditor} where commNo = #{item.commNo} and status = 'E'")
-    Integer auditComm(@Param("item") AuditCommEvt auditCommEvt);
+    @Update("update t_commodity set auditStatus = #{item.auditStatus}, auditor = #{auditor} where commNo = #{item.commNo} and status = 'E'")
+    Integer auditComm(@Param("item") AuditCommEvt auditCommEvt, @Param("auditor") String auditor);
 
     /**
      * 全部商品列表
