@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/commodity")
@@ -70,9 +72,9 @@ public class CommodityController {
      */
     @ApiOperation("商品发布接口")
     @RequestMapping(value = "/releaseComm", method = RequestMethod.POST)
-    public ServiceRespModel releaseComm(@ModelAttribute ReleaseCommEvt evt, HttpServletRequest request) {
+    public ServiceRespModel releaseComm(@ModelAttribute ReleaseCommEvt evt, List<MultipartFile> commPicList, HttpServletRequest request) {
         try {
-            return commodityService.releaseComm(evt, request);
+            return commodityService.releaseComm(evt, commPicList, request);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("商品发布功能异常");

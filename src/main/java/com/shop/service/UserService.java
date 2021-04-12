@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -176,31 +177,43 @@ public class UserService {
     /**
      * 修改个人信息
      */
-    public ServiceRespModel updateUserInfo(UpdateUserInfoEvt evt, HttpServletRequest request) throws Exception {
+    public ServiceRespModel updateUserInfo(UpdateUserInfoEvt evt, MultipartFile profile, HttpServletRequest request) throws Exception {
+        int flag = 0;
         // 将个人信息存至数据库
         UpdateUserInfoModel model = new UpdateUserInfoModel();
         model.setUserNo((String) request.getAttribute("userNo"));
-        if (evt.getProfile() != null) {
-            String name = StringUtils.replace(evt.getProfile().getOriginalFilename(), " ", "");
+        //更新个人信息
+        if (profile != null) {
+            String name = StringUtils.replace(profile.getOriginalFilename(), " ", "");
             String fileType = name.substring(name.lastIndexOf(".") + 1);
             if (!(fileType.toLowerCase().equals("jpg") || fileType.toLowerCase().equals("jpeg") || fileType.toLowerCase().equals("png")))
                 return new ServiceRespModel(-1, "仅支持图片格式上传", null);
-            PluploadModel pluploadModel = UploadFileTool.upload(evt.getProfile(), attachSavePath, attachViewPath);
+            PluploadModel pluploadModel = UploadFileTool.upload(profile, attachSavePath, attachViewPath);
             model.setProfileUrl(pluploadModel.getViewPath());
+            flag++;
         }
         if (evt.getUserName() != null) {
             model.setUserName(evt.getUserName());
+            flag++;
         }
         if (evt.getUserInfo() != null) {
             if (evt.getUserInfo().length() > 40) {
                 return new ServiceRespModel(-1, "简介字数超出限制长度", null);
             }
             model.setUserInfo(evt.getUserInfo());
+            flag++;
         }
         if (evt.getUserSex() != null) {
             model.setUserSex(evt.getUserSex());
+            flag++;
+        }
+        if (flag == 0) {
+            return new ServiceRespModel(-1, "修改信息不能为空", null);
         }
         int info = userMapper.updateUserInfo(model);
+        if (info == 0) {
+            return new ServiceRespModel(-1, "修改信息失败", null);
+        }
         return new ServiceRespModel(1, "成功修改" + info + "条信息", null);
     }
 }

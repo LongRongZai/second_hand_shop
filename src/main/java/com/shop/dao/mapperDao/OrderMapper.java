@@ -1,6 +1,7 @@
 package com.shop.dao.mapperDao;
 
 import com.shop.bean.OrderBean;
+import com.shop.model.CommOrderModel;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -20,15 +21,16 @@ public interface OrderMapper {
     /**
      * 查看用户提交的订单列表
      */
-    @Select("select * from t_order where status = 'E' and createUser = #{item}")
-    List<OrderBean> queryUserSubmitOrderList(@Param("item") String userNo);
+    @Select("select c.commName, c.commDesc, o.* from t_order o left join t_commodity c on o.commNo = c.commNo " +
+            "where o.status = 'E' and c.status = 'E' and o.createUser = #{item}")
+    List<CommOrderModel> queryUserSubmitOrderList(@Param("item") String userNo);
 
     /**
      * 查看用户接收的订单列表
      */
-    @Select("select o.* from t_order o left join t_commodity c on o.commNo = c.commNo " +
+    @Select("select c.commName, c.commDesc, o.* from t_order o left join t_commodity c on o.commNo = c.commNo " +
             "where o.status = 'E' and c.status = 'E' and c.createUser = #{item}")
-    List<OrderBean> queryUserReceiveOrderList(@Param("item") String userNo);
+    List<CommOrderModel> queryUserReceiveOrderList(@Param("item") String userNo);
 
     /**
      * 更新订单状态

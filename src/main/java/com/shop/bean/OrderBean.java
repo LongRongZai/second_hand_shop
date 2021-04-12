@@ -27,7 +27,7 @@ public class OrderBean {
     private String consignee;
     //收货人手机号
     @Column(name = "phone", length = 128, nullable = false)
-    private Integer phone;
+    private String phone;
     //购买数量
     @Column(name = "num", length = 128, nullable = false)
     private Integer num;

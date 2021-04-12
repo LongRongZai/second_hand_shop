@@ -3,9 +3,6 @@ package com.shop.evt;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Data
 public class ReleaseCommEvt {
@@ -25,8 +22,5 @@ public class ReleaseCommEvt {
     //商品库存
     @ApiModelProperty(value = "商品库存", required = true, example = "0")
     private Integer commStock;
-    //商品图片列表
-    @ApiModelProperty(value = "商品图片列表(限制最多五张图片)")
-    private List<MultipartFile> multipartFileList;
 
 }

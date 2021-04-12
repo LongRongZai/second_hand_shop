@@ -77,7 +77,7 @@ public class CommodityService {
      * 发布商品
      */
     @Transactional(rollbackFor = Exception.class)
-    public ServiceRespModel releaseComm(ReleaseCommEvt evt, HttpServletRequest request) throws Exception {
+    public ServiceRespModel releaseComm(ReleaseCommEvt evt, List<MultipartFile> commPicList, HttpServletRequest request) throws Exception {
         //校验用户状态
         UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
         if (userBean == null)
@@ -101,11 +101,11 @@ public class CommodityService {
         if (evt.getCommStock() < 0) {
             return new ServiceRespModel(-1, "非法的商品库存", null);
         }
-        if (evt.getMultipartFileList() != null) {
-            if (evt.getMultipartFileList().size() > 5) {
+        if (commPicList != null) {
+            if (commPicList.size() > 5) {
                 return new ServiceRespModel(-1, "超出限制上传附件数量", null);
             }
-            for (MultipartFile file : evt.getMultipartFileList()) {
+            for (MultipartFile file : commPicList) {
                 String name = StringUtils.replace(file.getOriginalFilename(), " ", "");
                 String fileType = name.substring(name.lastIndexOf(".") + 1);
                 if (!(fileType.toLowerCase().equals("jpg") || fileType.toLowerCase().equals("jpeg") || fileType.toLowerCase().equals("png")))
@@ -124,9 +124,9 @@ public class CommodityService {
             addComm.setCommTag(evt.getCommTag());
             addComm.setCommSale(0);
             addComm.setCreateUser((String) request.getAttribute("userNo"));
-            if (evt.getMultipartFileList() != null) {
+            if (commPicList != null) {
                 int flag = 0;
-                for (MultipartFile file : evt.getMultipartFileList()) {
+                for (MultipartFile file : commPicList) {
                     PluploadModel pluploadModel = UploadFileTool.upload(file, attachSavePath, attachViewPath);
                     CommPicBean addCommPic = new CommPicBean();
                     addCommPic.setCommPicNo(StringUtils.replace(UUID.randomUUID().toString(), "-", ""));
@@ -138,7 +138,7 @@ public class CommodityService {
                         flag++;
                     }
                 }
-                if (evt.getMultipartFileList().size() != flag) {
+                if (commPicList.size() != flag) {
                     throw new CommReleaseException("商品图片上传失败");
                 }
             }

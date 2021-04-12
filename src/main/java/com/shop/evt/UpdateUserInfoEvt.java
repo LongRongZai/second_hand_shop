@@ -3,7 +3,6 @@ package com.shop.evt;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class UpdateUserInfoEvt {
@@ -17,8 +16,5 @@ public class UpdateUserInfoEvt {
     //用户性别
     @ApiModelProperty(value = "用户性别(男,女")
     private String userSex;
-    //用户头像
-    @ApiModelProperty(value = "用户头像")
-    private MultipartFile profile;
 
 }

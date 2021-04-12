@@ -16,7 +16,7 @@ public class SubmitOrderEvt {
     private String consignee;
     //收货人手机号
     @ApiModelProperty(value = "收货人手机号", required = true, example = "0")
-    private Integer phone;
+    private String phone;
     //购买数量
     @ApiModelProperty(value = "购买数量", required = true, example = "1")
     private Integer num;

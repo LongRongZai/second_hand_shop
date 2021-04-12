@@ -63,7 +63,7 @@ public class OrderController {
     @RequestMapping(value = "/queryUserReceiveOrderList", method = RequestMethod.GET)
     public ServiceRespModel queryUserReceiveOrderList(HttpServletRequest request) {
         try {
-            return orderService.queryUserSubmitOrderList(request);
+            return orderService.queryUserReceiveOrderList(request);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("查看用户接收的订单列表功能异常");

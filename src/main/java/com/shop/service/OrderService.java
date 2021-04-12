@@ -10,6 +10,7 @@ import com.shop.evt.SubmitOrderEvt;
 import com.shop.evt.UpdateOrderStatusEvt;
 import com.shop.exceptions.OrderSystemException;
 import com.shop.exceptions.UpdateUserBalanceException;
+import com.shop.model.CommOrderModel;
 import com.shop.model.ServiceRespModel;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -51,7 +52,7 @@ public class OrderService {
             return new ServiceRespModel(-1, "商品编码不能为空", null);
         if (evt.getNum() == null)
             return new ServiceRespModel(-1, "购买数量不能为空", null);
-        if (evt.getPhone() == null)
+        if (StringUtils.isBlank(evt.getPhone()))
             return new ServiceRespModel(-1, "收货人手机号不能为空", null);
         //查询商品是否存在
         CommodityBean comm = commodityMapper.queryCommByNo(evt.getCommNo());
@@ -114,16 +115,22 @@ public class OrderService {
      * 查看用户提交的订单列表
      */
     public ServiceRespModel queryUserSubmitOrderList(HttpServletRequest request) {
-        List<OrderBean> orderBeanList = orderMapper.queryUserSubmitOrderList((String) request.getAttribute("userNo"));
-        return new ServiceRespModel(1, "用户提交的订单列表", orderBeanList);
+        List<CommOrderModel> commOrderModelList = orderMapper.queryUserSubmitOrderList((String) request.getAttribute("userNo"));
+        for (CommOrderModel commOrderModel : commOrderModelList) {
+            commOrderModel.setCommPicList(commodityMapper.queryPicByCommNo(commOrderModel.getCommNo()));
+        }
+        return new ServiceRespModel(1, "用户提交的订单列表", commOrderModelList);
     }
 
     /**
      * 查看用户接收的订单列表
      */
     public ServiceRespModel queryUserReceiveOrderList(HttpServletRequest request) {
-        List<OrderBean> orderBeanList = orderMapper.queryUserReceiveOrderList((String) request.getAttribute("userNo"));
-        return new ServiceRespModel(1, "用户接收的订单列表", orderBeanList);
+        List<CommOrderModel> commOrderModelList = orderMapper.queryUserReceiveOrderList((String) request.getAttribute("userNo"));
+        for (CommOrderModel commOrderModel : commOrderModelList) {
+            commOrderModel.setCommPicList(commodityMapper.queryPicByCommNo(commOrderModel.getCommNo()));
+        }
+        return new ServiceRespModel(1, "用户接收的订单列表", commOrderModelList);
     }
 
     /**
