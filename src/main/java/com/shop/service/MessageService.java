@@ -58,4 +58,27 @@ public class MessageService {
             return new ServiceRespModel(-1, "目标邮箱不存在", null);
         }
     }
+
+    /**
+     * 发送邮件信息
+     */
+    public ServiceRespModel sendEmailMsg(String email, String msg) {
+        //校验入参合法性
+        if (StringUtils.isBlank(email)) {
+            return new ServiceRespModel(-1, "邮箱不能为空", null);
+        }
+        //生成验证码及其他信息
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(sender);
+        message.setTo(email);
+        message.setSubject("福大校园二手商城");// 标题
+        message.setText("【福大校园二手商城】 " + msg);// 内容
+        //发送邮件
+        try {
+            javaMailSender.send(message);
+            return new ServiceRespModel(1, "邮件发送成功", null);
+        } catch (MailSendException e) {
+            return new ServiceRespModel(-1, "目标邮箱不存在", null);
+        }
+    }
 }

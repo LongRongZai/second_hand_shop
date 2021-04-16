@@ -13,6 +13,7 @@ import com.shop.model.ServiceRespModel;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -33,6 +34,9 @@ public class AdminService {
 
     @Resource
     CommodityMapper commodityMapper;
+
+    @Autowired
+    MessageService messageService;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -70,6 +74,8 @@ public class AdminService {
                 if (info1 != 1) {
                     throw new AuditCommException("更新用户不合格商品数失败");
                 }
+                messageService.sendEmailMsg(userBean.getUserEmail(),
+                        String.format("您发布的商品 %s 审核未通过，商品编码为 %s ，审核未通过原因：%s", commodityBean.getCommName(), evt.getCommNo(), evt.getAuditMsg()));
             }
             //修改商品审核状态
             int info = adminMapper.auditComm(evt, (String) request.getAttribute("userName"));

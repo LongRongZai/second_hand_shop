@@ -144,7 +144,6 @@ public class CommodityService {
             }
             int info = commodityMapper.releaseComm(addComm);
             if (info != 1) {
-                logger.info(String.format("用户%s发布一件商品", request.getAttribute("userEmail")));
                 throw new CommReleaseException("商品发布失败");
             }
         } catch (CommReleaseException e) {
@@ -152,6 +151,7 @@ public class CommodityService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return new ServiceRespModel(-1, e.getMessage(), null);
         }
+        logger.info(String.format("用户%s发布一件商品", request.getAttribute("userEmail")));
         return new ServiceRespModel(1, "商品发布成功", null);
     }
 
