@@ -14,7 +14,7 @@ public interface CommodityMapper {
     /**
      * 随机商品列表(随机选取n条数据）
      */
-    @Select("select commNo,commName from t_commodity " +
+    @Select("select commNo,commName,commPrice from t_commodity " +
             "where status = 'E' and auditStatus = 1 order by rand() limit #{item}")
     List<CommodityBean> randomCommList(@Param("item") Integer num);
 
