@@ -72,7 +72,7 @@ public interface CommodityMapper {
     /**
      * 查看用户发布的商品
      */
-    @Select("select commName, commNo, auditStatus, createTime from t_commodity where status = 'E' and createUser = #{item}")
+    @Select("select * from t_commodity where status = 'E' and createUser = #{item}")
     List<CommodityBean> queryUserComm(@Param("item") String userNo);
 
     /**
