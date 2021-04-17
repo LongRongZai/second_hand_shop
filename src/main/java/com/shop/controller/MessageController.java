@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "通知相关接口")
 public class MessageController {
     @Autowired//创建对象
-    MessageService messageService;
+    private MessageService messageService;
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 发送邮箱注册验证码

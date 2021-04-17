@@ -1,5 +1,7 @@
 package com.shop.service;
 
+import com.alibaba.fastjson.JSON;
+import com.shop.async.JmsProducer;
 import com.shop.bean.CommodityBean;
 import com.shop.bean.UserBean;
 import com.shop.dao.mapperDao.AdminMapper;
@@ -9,6 +11,7 @@ import com.shop.evt.AuditCommEvt;
 import com.shop.evt.SetUserIsBanEvt;
 import com.shop.exceptions.AuditCommException;
 import com.shop.model.CommModel;
+import com.shop.model.SendEmailModel;
 import com.shop.model.ServiceRespModel;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -27,18 +30,18 @@ import java.util.List;
 public class AdminService {
 
     @Resource
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Resource
-    AdminMapper adminMapper;
+    private AdminMapper adminMapper;
 
     @Resource
-    CommodityMapper commodityMapper;
+    private CommodityMapper commodityMapper;
 
     @Autowired
-    MessageService messageService;
+    private JmsProducer jmsProducer;
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 商品审核
@@ -74,8 +77,11 @@ public class AdminService {
                 if (info1 != 1) {
                     throw new AuditCommException("更新用户不合格商品数失败");
                 }
-                messageService.sendEmailMsg(userBean.getUserEmail(),
-                        String.format("您发布的商品 %s 审核未通过，商品编码为 %s ，审核未通过原因：%s", commodityBean.getCommName(), evt.getCommNo(), evt.getAuditMsg()));
+                SendEmailModel model = new SendEmailModel();
+                model.setEmail(userBean.getUserEmail());
+                model.setMsg(String.format("您发布的商品 %s 审核未通过，商品编码为 %s ，审核未通过原因：%s", commodityBean.getCommName(), evt.getCommNo(), evt.getAuditMsg()));
+                String json = JSON.toJSONString(model);
+                jmsProducer.sendMsg("mail.send", json);
             }
             //修改商品审核状态
             int info = adminMapper.auditComm(evt, (String) request.getAttribute("userName"));
@@ -130,6 +136,13 @@ public class AdminService {
         if (user == null)
             return new ServiceRespModel(-1, "用户不存在", null);
         //设置用户封禁状态
+        if (evt.getIsBan() == 1) {
+            SendEmailModel model = new SendEmailModel();
+            model.setEmail(userBean.getUserEmail());
+            model.setMsg(String.format("您的账号因多次发布不合格商品已被封禁，您将不能发布商品与购买商品"));
+            String json = JSON.toJSONString(model);
+            jmsProducer.sendMsg("mail.send", json);
+        }
         int info = adminMapper.setUserIsBan(evt);
         if (info == 1) {
             return new ServiceRespModel(1, "设置用户封禁状态成功", null);

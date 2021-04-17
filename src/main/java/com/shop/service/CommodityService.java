@@ -30,18 +30,18 @@ import java.util.UUID;
 public class CommodityService {
 
     @Resource
-    CommodityMapper commodityMapper;
+    private CommodityMapper commodityMapper;
 
     @Resource
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Value("${shop.attach.save.path}")
-    String attachSavePath;
+    private String attachSavePath;
 
     @Value("${shop.attach.view.path}")
-    String attachViewPath;
+    private String attachViewPath;
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 初始商品列表

@@ -1,5 +1,7 @@
 package com.shop.service;
 
+import com.alibaba.fastjson.JSON;
+import com.shop.async.JmsProducer;
 import com.shop.bean.CommodityBean;
 import com.shop.bean.OrderBean;
 import com.shop.bean.UserBean;
@@ -11,10 +13,12 @@ import com.shop.evt.UpdateOrderStatusEvt;
 import com.shop.exceptions.OrderSystemException;
 import com.shop.exceptions.UpdateUserBalanceException;
 import com.shop.model.CommOrderModel;
+import com.shop.model.SendEmailModel;
 import com.shop.model.ServiceRespModel;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -28,15 +32,18 @@ import java.util.UUID;
 public class OrderService {
 
     @Resource
-    OrderMapper orderMapper;
+    private OrderMapper orderMapper;
 
     @Resource
-    CommodityMapper commodityMapper;
+    private CommodityMapper commodityMapper;
 
     @Resource
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    private JmsProducer jmsProducer;
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 提交订单
@@ -102,6 +109,15 @@ public class OrderService {
             if (info3 != 1) {
                 throw new OrderSystemException("更新商品销量失败");
             }
+            UserBean saleUserBean = userMapper.queryUserByNo(comm.getCreateUser());
+            if (saleUserBean == null) {
+                return new ServiceRespModel(-1, "卖家不存在", null);
+            }
+            SendEmailModel model = new SendEmailModel();
+            model.setEmail(saleUserBean.getUserEmail());
+            model.setMsg(String.format("您的商品%s出售成功，商品编码为%s,了解具体信息请登录商城",comm.getCommName(),comm.getCommNo()));
+            String json = JSON.toJSONString(model);
+            jmsProducer.sendMsg("mail.send", json);
         } catch (OrderSystemException e) {
             e.printStackTrace();
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

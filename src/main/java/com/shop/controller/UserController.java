@@ -23,9 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
 
     @Autowired//创建对象
-    UserService userService;
+    private UserService userService;
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 用户登录

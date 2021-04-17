@@ -26,12 +26,12 @@ import java.util.List;
 @Api(tags = "商品相关接口")
 public class CommodityController {
     @Autowired//创建对象
-    MessageService messageService;
+    private MessageService messageService;
 
     @Autowired
-    CommodityService commodityService;
+    private CommodityService commodityService;
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 初始商品列表

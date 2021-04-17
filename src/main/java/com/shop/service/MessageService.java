@@ -1,6 +1,9 @@
 package com.shop.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.shop.dao.mapperDao.UserMapper;
+import com.shop.exceptions.SendMailException;
+import com.shop.model.SendEmailModel;
 import com.shop.model.ServiceRespModel;
 import com.shop.model.VerificationCodeModel;
 import com.shop.utils.Md5Util;
@@ -9,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,14 +24,14 @@ import javax.annotation.Resource;
 public class MessageService {
 
     @Value("${mail.fromMail.sender}")
-    String sender;// 发送者
+    private String sender;// 发送者
     @Resource
-    JavaMailSender javaMailSender;
+    private JavaMailSender javaMailSender;
 
     @Resource
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * 发送邮箱注册验证码
@@ -62,23 +66,22 @@ public class MessageService {
     /**
      * 发送邮件信息
      */
-    public ServiceRespModel sendEmailMsg(String email, String msg) {
-        //校验入参合法性
-        if (StringUtils.isBlank(email)) {
-            return new ServiceRespModel(-1, "邮箱不能为空", null);
-        }
-        //生成验证码及其他信息
+    @JmsListener(destination = "mail.send")
+    public void sendEmailMsg(String json) {
+        SendEmailModel model = JSONObject.parseObject(json,SendEmailModel.class);
+        //生成其他信息
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(sender);
-        message.setTo(email);
+        message.setTo(model.getEmail());
         message.setSubject("福大校园二手商城");// 标题
-        message.setText("【福大校园二手商城】 " + msg);// 内容
+        message.setText("【福大校园二手商城】 " + model.getMsg());// 内容
         //发送邮件
         try {
             javaMailSender.send(message);
-            return new ServiceRespModel(1, "邮件发送成功", null);
         } catch (MailSendException e) {
-            return new ServiceRespModel(-1, "目标邮箱不存在", null);
+            logger.error("目标邮箱 " + model.getEmail() + " 不存在，邮件发送失败");
+            throw new SendMailException("目标邮箱 " + model.getEmail() + " 不存在，邮件发送失败");
+
         }
     }
 }
