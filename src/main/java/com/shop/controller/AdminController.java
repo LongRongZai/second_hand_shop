@@ -1,5 +1,6 @@
 package com.shop.controller;
 
+import com.shop.evt.AuditAuthenticationEvt;
 import com.shop.evt.AuditCommEvt;
 import com.shop.evt.SetUserIsBanEvt;
 import com.shop.model.ServiceRespModel;
@@ -9,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -81,6 +83,21 @@ public class AdminController {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("查看全部用户功能异常");
+            return new ServiceRespModel(-1, "系统异常", null);
+        }
+    }
+
+    /**
+     * 用户认证信息审核
+     */
+    @ApiOperation("用户认证信息审核接口")
+    @RequestMapping(value = "/auditUserAuthentication", method = RequestMethod.POST)
+    public ServiceRespModel auditUserAuthentication(HttpServletRequest request, @ModelAttribute AuditAuthenticationEvt evt) {
+        try {
+            return adminService.auditUserAuthentication(request, evt);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("用户认证信息审核功能异常");
             return new ServiceRespModel(-1, "系统异常", null);
         }
     }

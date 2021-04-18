@@ -119,4 +119,19 @@ public class UserController {
             return new ServiceRespModel(-1, "系统异常", null);
         }
     }
+
+    /**
+     * 更新认证信息
+     */
+    @ApiOperation("更新认证信息接口")
+    @RequestMapping(value = "/uploadAuthenticationInfo", method = RequestMethod.POST)
+    public ServiceRespModel updateAuthenticationInfo(@ModelAttribute UpdateAuthenticationInfoEvt evt, MultipartFile photo, HttpServletRequest request) {
+        try {
+            return userService.updateAuthenticationInfo(evt, photo, request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("更新认证信息功能异常");
+            return new ServiceRespModel(-1, "系统异常", null);
+        }
+    }
 }

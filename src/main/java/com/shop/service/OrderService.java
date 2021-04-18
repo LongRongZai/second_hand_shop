@@ -70,10 +70,13 @@ public class OrderService {
         if (evt.getNum() <= 0 || evt.getNum() > comm.getCommStock()) {
             return new ServiceRespModel(-1, "购买数量不合法", null);
         }
-        //校验用户封禁状态
+        //校验用户状态
         UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
         if (userBean.getIsBan() == 1) {
             return new ServiceRespModel(-1, "用户处于封禁状态", null);
+        }
+        if (userBean.getAuthentication() != 2) {
+            return new ServiceRespModel(2, "用户认证未通过", null);
         }
         //校验用户余额
         int price = comm.getCommPrice() * evt.getNum();
@@ -115,7 +118,7 @@ public class OrderService {
             }
             SendEmailModel model = new SendEmailModel();
             model.setEmail(saleUserBean.getUserEmail());
-            model.setMsg(String.format("您的商品%s出售成功，商品编码为%s,了解具体信息请登录商城",comm.getCommName(),comm.getCommNo()));
+            model.setMsg(String.format("您的商品%s出售成功，商品编码为%s,了解具体信息请登录商城", comm.getCommName(), comm.getCommNo()));
             String json = JSON.toJSONString(model);
             jmsProducer.sendMsg("mail.send", json);
         } catch (OrderSystemException e) {

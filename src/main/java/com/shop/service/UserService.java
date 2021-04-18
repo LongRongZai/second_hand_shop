@@ -179,8 +179,7 @@ public class UserService {
      */
     public ServiceRespModel updateUserInfo(UpdateUserInfoEvt evt, MultipartFile profile, HttpServletRequest request) throws Exception {
         int flag = 0;
-        // 将个人信息存至数据库
-        UpdateUserInfoModel model = new UpdateUserInfoModel();
+        UpdateUserModel model = new UpdateUserModel();
         model.setUserNo((String) request.getAttribute("userNo"));
         //更新个人信息
         if (profile != null) {
@@ -210,10 +209,43 @@ public class UserService {
         if (flag == 0) {
             return new ServiceRespModel(-1, "修改信息不能为空", null);
         }
-        int info = userMapper.updateUserInfo(model);
+        // 将个人信息存至数据库
+        int info = userMapper.updateUser(model);
         if (info == 0) {
             return new ServiceRespModel(-1, "修改信息失败", null);
         }
         return new ServiceRespModel(1, "成功修改" + info + "条信息", null);
+    }
+
+    /**
+     * 更新认证信息
+     */
+    public ServiceRespModel updateAuthenticationInfo(UpdateAuthenticationInfoEvt evt, MultipartFile profile, HttpServletRequest request) throws Exception {
+        // 检验入参合法性
+        if (StringUtils.isBlank(evt.getUserRealName()))
+            return new ServiceRespModel(-1, "用户真实姓名不能为空", null);
+        if (StringUtils.isBlank(evt.getCollege()))
+            return new ServiceRespModel(-1, "学号不能为空", null);
+        if (StringUtils.isBlank(evt.getSno()))
+            return new ServiceRespModel(-1, "学院不能为空", null);
+        //上传图片
+        String name = StringUtils.replace(profile.getOriginalFilename(), " ", "");
+        String fileType = name.substring(name.lastIndexOf(".") + 1);
+        if (!(fileType.toLowerCase().equals("jpg") || fileType.toLowerCase().equals("jpeg") || fileType.toLowerCase().equals("png")))
+            return new ServiceRespModel(-1, "仅支持图片格式上传", null);
+        PluploadModel pluploadModel = UploadFileTool.upload(profile, attachSavePath, attachViewPath);
+        //将认证信息保存至数据库
+        UpdateUserModel model = new UpdateUserModel();
+        model.setUserNo((String) request.getAttribute("userNo"));
+        model.setPhotoUrl(pluploadModel.getViewPath());
+        model.setUserRealName(evt.getUserRealName());
+        model.setCollege(evt.getCollege());
+        model.setSno(evt.getSno());
+        model.setAuthentication(1);
+        int info = userMapper.updateUser(model);
+        if (info == 0) {
+            return new ServiceRespModel(-1, "更新认证信息失败", null);
+        }
+        return new ServiceRespModel(1, "更新认证信息成功", null);
     }
 }

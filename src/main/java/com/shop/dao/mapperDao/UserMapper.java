@@ -2,7 +2,7 @@ package com.shop.dao.mapperDao;
 
 import com.shop.bean.UserBean;
 import com.shop.dao.provider.UserProvider;
-import com.shop.model.UpdateUserInfoModel;
+import com.shop.model.UpdateUserModel;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -26,8 +26,8 @@ public interface UserMapper {
     /**
      * 插入用户
      */
-    @Insert("insert into t_user(userNO,createTime,status,userEmail,userName,userPassword,isBan,userRoot,balance,unquaComm)values" +
-            "(#{item.userNo},now(),'E',#{item.userEmail},#{item.userName},#{item.userPassword},0,0,1000,0)")
+    @Insert("insert into t_user(userNO,createTime,status,userEmail,userName,userPassword,isBan,userRoot,balance,unquaComm,authentication)values" +
+            "(#{item.userNo},now(),'E',#{item.userEmail},#{item.userName},#{item.userPassword},0,0,1000,0,0)")
     Integer insertUser(@Param("item") UserBean userBean);
 
     /**
@@ -49,10 +49,10 @@ public interface UserMapper {
     Integer changePasswordByEmail(@Param("newPassword") String newPassword, @Param("userEmail") String userEmail);
 
     /**
-     * 修改个人信息
+     * 更新用户信息
      */
     @UpdateProvider(type = UserProvider.class, method = "updateUserInfo")
-    Integer updateUserInfo(UpdateUserInfoModel model);
+    Integer updateUser(UpdateUserModel model);
 
     /**
      * 更新用户余额

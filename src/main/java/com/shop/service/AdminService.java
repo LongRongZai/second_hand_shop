@@ -7,12 +7,14 @@ import com.shop.bean.UserBean;
 import com.shop.dao.mapperDao.AdminMapper;
 import com.shop.dao.mapperDao.CommodityMapper;
 import com.shop.dao.mapperDao.UserMapper;
+import com.shop.evt.AuditAuthenticationEvt;
 import com.shop.evt.AuditCommEvt;
 import com.shop.evt.SetUserIsBanEvt;
 import com.shop.exceptions.AuditCommException;
-import com.shop.model.CommModel;
+import com.shop.model.AdminCommModel;
 import com.shop.model.SendEmailModel;
 import com.shop.model.ServiceRespModel;
+import com.shop.model.UpdateUserModel;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,6 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -108,9 +109,11 @@ public class AdminService {
             return new ServiceRespModel(-1, "无操作权限", null);
         }
         //返回全部商品列表
-        List<CommodityBean> commodityBeanList = adminMapper.commList();
-        List<CommModel> commModelList = queryCommPic(commodityBeanList);
-        return new ServiceRespModel(1, "全部商品列表", commModelList);
+        List<AdminCommModel> adminCommModelList = adminMapper.commList();
+        for (AdminCommModel adminCommModel : adminCommModelList) {
+            adminCommModel.setCommPicList(commodityMapper.queryPicByCommNo(adminCommModel.getCommNo()));
+        }
+        return new ServiceRespModel(1, "全部商品列表", adminCommModelList);
     }
 
     /**
@@ -143,7 +146,10 @@ public class AdminService {
             String json = JSON.toJSONString(model);
             jmsProducer.sendMsg("mail.send", json);
         }
-        int info = adminMapper.setUserIsBan(evt);
+        UpdateUserModel model = new UpdateUserModel();
+        model.setUserNo(evt.getUserNo());
+        model.setIsBan(evt.getIsBan());
+        int info = userMapper.updateUser(model);
         if (info == 1) {
             return new ServiceRespModel(1, "设置用户封禁状态成功", null);
         }
@@ -165,16 +171,43 @@ public class AdminService {
         return new ServiceRespModel(1, "全部用户列表", adminMapper.userList());
     }
 
-
-    private List<CommModel> queryCommPic(List<CommodityBean> commodityBeanList) {
-        List<CommModel> commModelList = new ArrayList<>();
-        for (CommodityBean commodityBean : commodityBeanList) {
-            CommModel model = new CommModel();
-            model.setCommPicList(commodityMapper.queryPicByCommNo(commodityBean.getCommNo()));
-            model.setCommodity(commodityBean);
-            commModelList.add(model);
+    /**
+     * 用户认证信息审核
+     */
+    public ServiceRespModel auditUserAuthentication(HttpServletRequest request, AuditAuthenticationEvt evt) {
+        //校验用户权限
+        UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
+        if (userBean == null)
+            return new ServiceRespModel(-1, "用户不存在", null);
+        if (userBean.getUserRoot() != 1) {
+            return new ServiceRespModel(-1, "无操作权限", null);
         }
-        return commModelList;
+        //校验用户是否存在
+        UserBean user = userMapper.queryUserByNo(evt.getUserNo());
+        if (user == null)
+            return new ServiceRespModel(-1, "用户不存在", null);
+        //更新审核信息
+        UpdateUserModel model = new UpdateUserModel();
+        model.setUserNo(evt.getUserNo());
+        model.setIsBan(evt.getAuthentication());
+        int info = userMapper.updateUser(model);
+        if (info == 1) {
+            if (evt.getAuthentication() == 2) {
+                SendEmailModel sendEmailModel = new SendEmailModel();
+                sendEmailModel.setEmail(user.getUserEmail());
+                sendEmailModel.setMsg(String.format("您好%s，您的用户认证已通过", user.getUserName()));
+                String json = JSON.toJSONString(sendEmailModel);
+                jmsProducer.sendMsg("mail.send", json);
+            }
+            if (evt.getAuthentication() == 3) {
+                SendEmailModel sendEmailModel = new SendEmailModel();
+                sendEmailModel.setEmail(user.getUserEmail());
+                sendEmailModel.setMsg(String.format("您好%s，您的用户认证未能通过", user.getUserName()));
+                String json = JSON.toJSONString(sendEmailModel);
+                jmsProducer.sendMsg("mail.send", json);
+            }
+            return new ServiceRespModel(1, "设置用户认证状态成功", null);
+        }
+        return new ServiceRespModel(-1, "设置用户认证状态失败", null);
     }
-
 }

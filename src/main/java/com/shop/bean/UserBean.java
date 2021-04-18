@@ -52,6 +52,18 @@ public class UserBean {
     //余额
     @Column(name = "balance", length = 128)
     private long balance;
+    //认证状态(0 未认证, 1 认证中, 2 认证通过 , 3 认证失败)
+    @Column(name = "authentication", length = 128)
+    private Integer authentication;
+    //学号
+    @Column(name = "Sno", length = 128)
+    private String sno;
+    //学院
+    @Column(name = "college", length = 128)
+    private String college;
+    //认证照片地址
+    @Column(name = "photoUrl", length = 128)
+    private String photoUrl;
     //最近登录时间
     @Column(name = "lastLoginTime", length = 128)
     private Date lastLoginTime;

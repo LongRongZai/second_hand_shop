@@ -11,7 +11,7 @@ import lombok.Data;
 public class ServiceRespModel {
 
     //应答码 (1 = 成功 -1 = 接口失败)
-    @ApiModelProperty(value = "应答码(1 = 成功，-1 = 接口失败)")
+    @ApiModelProperty(value = "应答码(1 成功, -1 接口失败, 2 跳转 )")
     private Integer code;
     //应答消息
     @ApiModelProperty(value = "应答消息")
