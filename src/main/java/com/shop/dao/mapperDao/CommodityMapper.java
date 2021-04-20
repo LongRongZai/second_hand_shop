@@ -2,6 +2,8 @@ package com.shop.dao.mapperDao;
 
 import com.shop.bean.CommPicBean;
 import com.shop.bean.CommodityBean;
+import com.shop.dao.provider.CommodityProvider;
+import com.shop.model.RandomCommListModel;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -14,9 +16,8 @@ public interface CommodityMapper {
     /**
      * 随机商品列表(随机选取n条数据）
      */
-    @Select("select commNo,commName,commPrice from t_commodity " +
-            "where status = 'E' and auditStatus = 1 order by rand() limit #{item}")
-    List<CommodityBean> randomCommList(@Param("item") Integer num);
+    @SelectProvider(type = CommodityProvider.class, method = "randomCommList")
+    List<CommodityBean> randomCommList(RandomCommListModel model);
 
     /**
      * 查询商品对应的图片
@@ -28,8 +29,8 @@ public interface CommodityMapper {
     /**
      * 发布商品
      */
-    @Insert("insert into t_commodity(commNo,commName,commTag,commDesc,commPrice,commSale,commStock,status,createTime,createUser,auditStatus)values" +
-            "(#{item.commNo},#{item.commName},#{item.commTag},#{item.commDesc},#{item.commPrice},#{item.commSale},#{item.commStock},'E',now(),#{item.createUser},0)")
+    @Insert("insert into t_commodity(commNo,commName,commTag,commDesc,commPrice,commSale,commStock,status,createTime,createUser,auditStatus,recommend)values" +
+            "(#{item.commNo},#{item.commName},#{item.commTag},#{item.commDesc},#{item.commPrice},#{item.commSale},#{item.commStock},'E',now(),#{item.createUser},0,0)")
     Integer releaseComm(@Param("item") CommodityBean commodityBean);
 
     /**
@@ -60,7 +61,7 @@ public interface CommodityMapper {
     /**
      * 删除商品
      */
-    @Update("update t_commodity c left join t_commPic cp on c.commNo = cp.commNo set c.status = 'D', cp.status = 'D' where c.commNo = #{item} and c.status = 'E' and cp.status = 'E'")
+    @Update("update t_commodity c left join t_commPic cp on c.commNo = cp.commNo set c.status = 'D', cp.status = 'D', c.updateTime = now(), cp.updateTime = now() where c.commNo = #{item} and c.status = 'E' and cp.status = 'E'")
     Integer deleteComm(@Param("item") String commNo);
 
     /**
@@ -78,7 +79,7 @@ public interface CommodityMapper {
     /**
      * 更新商品销量
      */
-    @Update("update t_commodity set commSale = commSale + #{num} where commNo = #{commNo} and status = 'E'")
+    @Update("update t_commodity set commSale = commSale + #{num}, updateTime = now() where commNo = #{commNo} and status = 'E'")
     Integer updateCommSale(@Param("num") Integer num, @Param("commNo") String commNo);
 
 }

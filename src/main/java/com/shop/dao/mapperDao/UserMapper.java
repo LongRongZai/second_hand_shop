@@ -39,13 +39,13 @@ public interface UserMapper {
     /**
      * 修改密码
      */
-    @Update("update t_user set userPassword = #{newPassword} where userNo = #{userNo} and status = 'E'")
+    @Update("update t_user set userPassword = #{newPassword}, updateTime = now() where userNo = #{userNo} and status = 'E'")
     Integer changePassword(@Param("newPassword") String newPassword, @Param("userNo") String userNo);
 
     /**
      * 邮箱验证修改密码
      */
-    @Update("update t_user set userPassword = #{newPassword} where userEmail = #{userEmail} and status = 'E'")
+    @Update("update t_user set userPassword = #{newPassword}, updateTime = now() where userEmail = #{userEmail} and status = 'E'")
     Integer changePasswordByEmail(@Param("newPassword") String newPassword, @Param("userEmail") String userEmail);
 
     /**
@@ -57,7 +57,7 @@ public interface UserMapper {
     /**
      * 更新用户余额
      */
-    @Update("update t_user set balance = balance + #{num} where userNo = #{userNo} and status = 'E'")
+    @Update("update t_user set balance = balance + #{num}, updateTime = now() where userNo = #{userNo} and status = 'E'")
     Integer updateUserBalance(@Param("num") Integer num, @Param("userNo") String userNo);
 
 }

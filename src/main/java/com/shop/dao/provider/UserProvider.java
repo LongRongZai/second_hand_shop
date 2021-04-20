@@ -12,6 +12,7 @@ public class UserProvider {
             {
                 UPDATE("t_user");
                 WHERE("status = 'E' and userNo = #{userNo}");
+                SET("updateTime = now()");
                 if (StringUtils.isNotBlank(model.getProfileUrl())) {
                     SET("profileUrl = #{profileUrl}");
                 }

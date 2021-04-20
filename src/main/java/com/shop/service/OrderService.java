@@ -112,10 +112,12 @@ public class OrderService {
             if (info3 != 1) {
                 throw new OrderSystemException("更新商品销量失败");
             }
+            //校验卖家是否存在
             UserBean saleUserBean = userMapper.queryUserByNo(comm.getCreateUser());
             if (saleUserBean == null) {
                 return new ServiceRespModel(-1, "卖家不存在", null);
             }
+            //发送邮件
             SendEmailModel model = new SendEmailModel();
             model.setEmail(saleUserBean.getUserEmail());
             model.setMsg(String.format("您的商品%s出售成功，商品编码为%s,了解具体信息请登录商城", comm.getCommName(), comm.getCommNo()));

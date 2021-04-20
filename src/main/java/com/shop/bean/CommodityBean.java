@@ -34,6 +34,9 @@ public class CommodityBean {
     //商品库存
     @Column(name = "commStock", length = 128)
     private Integer commStock;
+    //推荐(0 未推荐, 1 推荐)
+    @Column(name = "recommend", length = 128)
+    private Integer recommend;
     //状态
     @Column(name = "status", length = 128)
     private String status;

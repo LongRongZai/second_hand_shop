@@ -2,6 +2,7 @@ package com.shop.dao.mapperDao;
 
 import com.shop.bean.UserBean;
 import com.shop.evt.AuditCommEvt;
+import com.shop.evt.SetCommRecEvt;
 import com.shop.evt.SetUserIsBanEvt;
 import com.shop.model.AdminCommModel;
 import org.apache.ibatis.annotations.Mapper;
@@ -19,7 +20,7 @@ public interface AdminMapper {
     /**
      * 商品审核
      */
-    @Update("update t_commodity set auditStatus = #{item.auditStatus}, auditor = #{auditor} where commNo = #{item.commNo} and status = 'E'")
+    @Update("update t_commodity set auditStatus = #{item.auditStatus}, auditor = #{auditor}, auditTime = now() where commNo = #{item.commNo} and status = 'E'")
     Integer auditComm(@Param("item") AuditCommEvt auditCommEvt, @Param("auditor") String auditor);
 
     /**
@@ -31,7 +32,7 @@ public interface AdminMapper {
     /**
      * 设置用户封禁状态
      */
-    @Update("update t_user set isBan = #{item.isBan} where userNo = #{item.userNo} and status = 'E'")
+    @Update("update t_user set isBan = #{item.isBan}, updateTime = now() where userNo = #{item.userNo} and status = 'E'")
     Integer setUserIsBan(@Param("item") SetUserIsBanEvt setUserIsBanEvt);
 
     /**
@@ -43,8 +44,14 @@ public interface AdminMapper {
     /**
      * 更新用户不合格商品数
      */
-    @Update("update t_user set unquaComm = unquaComm + 1 where userNo = #{item} and status = 'E'")
+    @Update("update t_user set unquaComm = unquaComm + 1 where userNo = #{item}, updateTime = now() and status = 'E'")
     Integer updateUserUnquaComm(@Param("item") String userNo);
+
+    /**
+     * 设置商品推荐
+     */
+    @Update("update t_commodity set recommend = #{item.recommend}, updateTime = now() where commNo = #{item.commNo} and status = 'E'")
+    Integer setCommRec(@Param("item") SetCommRecEvt evt);
 
 
 }

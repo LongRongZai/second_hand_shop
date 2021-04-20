@@ -2,6 +2,7 @@ package com.shop.controller;
 
 import com.shop.evt.AuditAuthenticationEvt;
 import com.shop.evt.AuditCommEvt;
+import com.shop.evt.SetCommRecEvt;
 import com.shop.evt.SetUserIsBanEvt;
 import com.shop.model.ServiceRespModel;
 import com.shop.service.AdminService;
@@ -98,6 +99,21 @@ public class AdminController {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("用户认证信息审核功能异常");
+            return new ServiceRespModel(-1, "系统异常", null);
+        }
+    }
+
+    /**
+     * 设置商品推荐
+     */
+    @ApiOperation("设置商品推荐接口")
+    @RequestMapping(value = "/setCommRec", method = RequestMethod.POST)
+    public ServiceRespModel setCommRec(HttpServletRequest request, @ModelAttribute SetCommRecEvt evt) {
+        try {
+            return adminService.setCommRec(request, evt);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("设置商品推荐功能异常");
             return new ServiceRespModel(-1, "系统异常", null);
         }
     }

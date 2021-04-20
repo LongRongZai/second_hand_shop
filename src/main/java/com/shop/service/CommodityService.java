@@ -9,6 +9,7 @@ import com.shop.evt.ReleaseCommEvt;
 import com.shop.exceptions.CommReleaseException;
 import com.shop.model.CommModel;
 import com.shop.model.PluploadModel;
+import com.shop.model.RandomCommListModel;
 import com.shop.model.ServiceRespModel;
 import com.shop.utils.UploadFileTool;
 import org.apache.commons.lang.StringUtils;
@@ -52,7 +53,9 @@ public class CommodityService {
             return new ServiceRespModel(-1, "查询条数不能为空", null);
         }
         //查询商品
-        List<CommodityBean> commodityBeanList = commodityMapper.randomCommList(num);
+        RandomCommListModel model = new RandomCommListModel();
+        model.setNum(num);
+        List<CommodityBean> commodityBeanList = commodityMapper.randomCommList(model);
         //查询商品对应的图片
         List<CommModel> commModelList = queryCommPic(commodityBeanList);
         return new ServiceRespModel(1, "初始商品列表", commModelList);
@@ -67,7 +70,10 @@ public class CommodityService {
             return new ServiceRespModel(-1, "查询条数不能为空", null);
         }
         //查询商品
-        List<CommodityBean> commodityBeanList = commodityMapper.randomCommList(num);
+        RandomCommListModel model = new RandomCommListModel();
+        model.setNum(num);
+        model.setRecommend(1);
+        List<CommodityBean> commodityBeanList = commodityMapper.randomCommList(model);
         //查询商品对应的图片
         List<CommModel> commModelList = queryCommPic(commodityBeanList);
         return new ServiceRespModel(1, "轮播商品列表", commModelList);
@@ -258,7 +264,7 @@ public class CommodityService {
         return new ServiceRespModel(1, "用户发布的商品列表", commModelList);
     }
 
-
+    //查询商品对应图片
     private List<CommModel> queryCommPic(List<CommodityBean> commodityBeanList) {
         List<CommModel> commModelList = new ArrayList<>();
         for (CommodityBean commodityBean : commodityBeanList) {

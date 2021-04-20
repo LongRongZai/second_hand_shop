@@ -9,6 +9,7 @@ import com.shop.dao.mapperDao.CommodityMapper;
 import com.shop.dao.mapperDao.UserMapper;
 import com.shop.evt.AuditAuthenticationEvt;
 import com.shop.evt.AuditCommEvt;
+import com.shop.evt.SetCommRecEvt;
 import com.shop.evt.SetUserIsBanEvt;
 import com.shop.exceptions.AuditCommException;
 import com.shop.model.AdminCommModel;
@@ -138,7 +139,7 @@ public class AdminService {
         UserBean user = userMapper.queryUserByNo(evt.getUserNo());
         if (user == null)
             return new ServiceRespModel(-1, "用户不存在", null);
-        //设置用户封禁状态
+        //发送邮件
         if (evt.getIsBan() == 1) {
             SendEmailModel model = new SendEmailModel();
             model.setEmail(userBean.getUserEmail());
@@ -146,6 +147,7 @@ public class AdminService {
             String json = JSON.toJSONString(model);
             jmsProducer.sendMsg("mail.send", json);
         }
+        //更新封禁状态
         UpdateUserModel model = new UpdateUserModel();
         model.setUserNo(evt.getUserNo());
         model.setIsBan(evt.getIsBan());
@@ -192,6 +194,7 @@ public class AdminService {
         model.setIsBan(evt.getAuthentication());
         int info = userMapper.updateUser(model);
         if (info == 1) {
+            //发送邮件
             if (evt.getAuthentication() == 2) {
                 SendEmailModel sendEmailModel = new SendEmailModel();
                 sendEmailModel.setEmail(user.getUserEmail());
@@ -209,5 +212,28 @@ public class AdminService {
             return new ServiceRespModel(1, "设置用户认证状态成功", null);
         }
         return new ServiceRespModel(-1, "设置用户认证状态失败", null);
+    }
+
+    /**
+     * 设置商品推荐
+     */
+    public ServiceRespModel setCommRec(HttpServletRequest request, SetCommRecEvt evt) {
+        //校验用户权限
+        UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
+        if (userBean == null)
+            return new ServiceRespModel(-1, "用户不存在", null);
+        if (userBean.getUserRoot() != 1) {
+            return new ServiceRespModel(-1, "无操作权限", null);
+        }
+        //校验商品是否存在
+        CommodityBean comm = commodityMapper.queryCommByNo(evt.getCommNo());
+        if (comm == null)
+            return new ServiceRespModel(-1, "商品不存在", null);
+        //设置商品推荐
+        int info = adminMapper.setCommRec(evt);
+        if (info == 1) {
+            return new ServiceRespModel(1, "设置商品推荐成功", null);
+        }
+        return new ServiceRespModel(-1, "设置商品推荐失败", null);
     }
 }
