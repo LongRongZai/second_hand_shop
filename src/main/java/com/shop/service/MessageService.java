@@ -1,6 +1,8 @@
 package com.shop.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.shop.async.JmsProducer;
 import com.shop.dao.mapperDao.UserMapper;
 import com.shop.exceptions.SendMailException;
 import com.shop.model.SendEmailModel;
@@ -11,6 +13,7 @@ import com.shop.utils.VerificationCode;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.mail.MailSendException;
@@ -31,6 +34,9 @@ public class MessageService {
     @Resource
     private UserMapper userMapper;
 
+    @Autowired
+    private JmsProducer jmsProducer;
+
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
@@ -44,23 +50,19 @@ public class MessageService {
         //生成验证码及其他信息
         SimpleMailMessage message = new SimpleMailMessage();
         String code = VerificationCode.generateCode(4);   //随机数生成4位验证码
-        message.setFrom(sender);
-        message.setTo(email);
-        message.setSubject("福大校园二手商城");// 标题
-        message.setText("【福大校园二手商城】您的验证码为：" + code + " 有效期为5分钟");// 内容
+        SendEmailModel model = new SendEmailModel();
+        model.setEmail(email);
+        model.setMsg("【福大校园二手商城】您的验证码为：" + code + " 有效期为5分钟");
         //发送邮件
-        try {
-            javaMailSender.send(message);
-            VerificationCodeModel model = new VerificationCodeModel();
-            String time = String.valueOf(System.currentTimeMillis() + 300000);
-            String vCode = Md5Util.MD5(code + email + time);
-            model.setCode(vCode);
-            model.setTime(time);
-            logger.info(String.format("注册邮件已发送至%s", email));
-            return new ServiceRespModel(1, "邮件发送成功", model);
-        } catch (MailSendException e) {
-            return new ServiceRespModel(-1, "目标邮箱不存在", null);
-        }
+        String json = JSON.toJSONString(model);
+        jmsProducer.sendMsg("mail.send", json);
+        VerificationCodeModel verificationCodeModel = new VerificationCodeModel();
+        String time = String.valueOf(System.currentTimeMillis() + 300000);
+        String vCode = Md5Util.MD5(code + email + time);
+        verificationCodeModel.setCode(vCode);
+        verificationCodeModel.setTime(time);
+        logger.info(String.format("注册邮件已发送至%s", email));
+        return new ServiceRespModel(1, "邮件发送成功", verificationCodeModel);
     }
 
     /**
@@ -68,7 +70,7 @@ public class MessageService {
      */
     @JmsListener(destination = "mail.send")
     public void sendEmailMsg(String json) {
-        SendEmailModel model = JSONObject.parseObject(json,SendEmailModel.class);
+        SendEmailModel model = JSONObject.parseObject(json, SendEmailModel.class);
         //生成其他信息
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(sender);

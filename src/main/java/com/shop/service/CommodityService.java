@@ -191,7 +191,7 @@ public class CommodityService {
             return new ServiceRespModel(-1, "搜索关键字不能为空", null);
         }
         //搜索商品
-        List<String> commodityBeanList = commodityMapper.preQueryCommByName(keyName, num);
+        List<CommodityBean> commodityBeanList = commodityMapper.preQueryCommByName(keyName, num);
         return new ServiceRespModel(1, "商品预搜索列表", commodityBeanList);
     }
 

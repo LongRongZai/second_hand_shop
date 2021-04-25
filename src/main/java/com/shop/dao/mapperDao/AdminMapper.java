@@ -3,7 +3,6 @@ package com.shop.dao.mapperDao;
 import com.shop.bean.UserBean;
 import com.shop.evt.AuditCommEvt;
 import com.shop.evt.SetCommRecEvt;
-import com.shop.evt.SetUserIsBanEvt;
 import com.shop.model.AdminCommModel;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -29,16 +28,11 @@ public interface AdminMapper {
     @Select("select c.*, u.userName from t_commodity c left join t_user u on c.createUser = u.userNo where c.status = 'E' and u.status = 'E'")
     List<AdminCommModel> commList();
 
-    /**
-     * 设置用户封禁状态
-     */
-    @Update("update t_user set isBan = #{item.isBan}, updateTime = now() where userNo = #{item.userNo} and status = 'E'")
-    Integer setUserIsBan(@Param("item") SetUserIsBanEvt setUserIsBanEvt);
 
     /**
      * 全部用户列表
      */
-    @Select("select userName, userEmail, isBan, userNo, createTime, lastLoginTime from t_user where status = 'E'")
+    @Select("select * from t_user where status = 'E'")
     List<UserBean> userList();
 
     /**

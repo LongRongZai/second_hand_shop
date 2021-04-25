@@ -191,7 +191,7 @@ public class AdminService {
         //更新审核信息
         UpdateUserModel model = new UpdateUserModel();
         model.setUserNo(evt.getUserNo());
-        model.setIsBan(evt.getAuthentication());
+        model.setAuthentication(evt.getAuthentication());
         int info = userMapper.updateUser(model);
         if (info == 1) {
             //发送邮件

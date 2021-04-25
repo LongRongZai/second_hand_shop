@@ -44,7 +44,7 @@ public class OrderBean {
     @Column(name = "createTime", length = 128)
     private Date createTime;
     //创建人
-    @Column(name = "createUser", length = 128)
+    @Column(name = "createUser", length = 128, nullable = false)
     private String createUser;
     //更新时间
     @Column(name = "updateTime", length = 128)

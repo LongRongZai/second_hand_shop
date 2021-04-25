@@ -36,14 +36,14 @@ public interface CommodityMapper {
     /**
      * 商品搜索
      */
-    @Select("select commName, commNo from t_commodity where status = 'E' and auditStatus = 1 and commName like CONCAT('%',#{item},'%')")
+    @Select("select * from t_commodity where status = 'E' and auditStatus = 1 and commName like CONCAT('%',#{item},'%')")
     List<CommodityBean> queryCommByName(@Param("item") String keyName);
 
     /**
      * 商品预搜索
      */
-    @Select("select commName from t_commodity where status = 'E' and auditStatus = 1 and commName like CONCAT('%',#{keyName},'%') limit #{num}")
-    List<String> preQueryCommByName(@Param("keyName") String keyName, @Param("num") Integer num);
+    @Select("select commName,commNo from t_commodity where status = 'E' and auditStatus = 1 and commName like CONCAT('%',#{keyName},'%') limit #{num}")
+    List<CommodityBean> preQueryCommByName(@Param("keyName") String keyName, @Param("num") Integer num);
 
     /**
      * 查看商品
@@ -67,7 +67,7 @@ public interface CommodityMapper {
     /**
      * 通过标签搜索商品
      */
-    @Select("select commName, commNo from t_commodity where status = 'E' and auditStatus = 1 and commTag = #{item}")
+    @Select("select * from t_commodity where status = 'E' and auditStatus = 1 and commTag = #{item}")
     List<CommodityBean> queryCommByTag(@Param("item") Integer commTag);
 
     /**

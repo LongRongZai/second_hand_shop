@@ -29,7 +29,7 @@ public class UserBean {
     @Column(name = "userPassword", length = 128, nullable = false)
     private String userPassword;
     //用户简介
-    @Column(name = "userInfo", length = 128)
+    @Column(name = "userInfo", length = 256)
     private String userInfo;
     //用户性别
     @Column(name = "userSex", length = 128)
@@ -41,19 +41,19 @@ public class UserBean {
     @Column(name = "profileUrl", length = 128)
     private String profileUrl;
     //不合格商品数
-    @Column(name = "unquaComm", length = 128)
+    @Column(name = "unquaComm", length = 128, nullable = false)
     private Integer unquaComm;
     //封禁状态(0 正常, 1 封禁)
-    @Column(name = "isBan", length = 128)
+    @Column(name = "isBan", length = 128, nullable = false)
     private Integer isBan;
     //用户权限(0 普通用户, 1 管理员)
-    @Column(name = "userRoot", length = 128)
+    @Column(name = "userRoot", length = 128, nullable = false)
     private Integer userRoot;
     //余额
-    @Column(name = "balance", length = 128)
+    @Column(name = "balance", length = 128, nullable = false)
     private long balance;
     //认证状态(0 未认证, 1 认证中, 2 认证通过 , 3 认证失败)
-    @Column(name = "authentication", length = 128)
+    @Column(name = "authentication", length = 128, nullable = false)
     private Integer authentication;
     //学号
     @Column(name = "Sno", length = 128)

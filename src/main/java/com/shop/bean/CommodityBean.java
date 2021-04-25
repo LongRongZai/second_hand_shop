@@ -20,31 +20,31 @@ public class CommodityBean {
     @Column(name = "commName", length = 128, nullable = false)
     private String commName;
     //商品标签(0 衣物,1 数码,2 食品,3 图书,4 化妆品,5 文具,6 居家)
-    @Column(name = "commTag", length = 128)
+    @Column(name = "commTag", length = 128, nullable = false)
     private Integer commTag;
     //商品描述
-    @Column(name = "commDesc", length = 512)
+    @Column(name = "commDesc", length = 512, nullable = false)
     private String commDesc;
     //商品价格
-    @Column(name = "commPrice", length = 128)
+    @Column(name = "commPrice", length = 128, nullable = false)
     private Integer commPrice;
     //商品销量
     @Column(name = "commSale", length = 128)
     private Integer commSale;
     //商品库存
-    @Column(name = "commStock", length = 128)
+    @Column(name = "commStock", length = 128, nullable = false)
     private Integer commStock;
     //推荐(0 未推荐, 1 推荐)
-    @Column(name = "recommend", length = 128)
+    @Column(name = "recommend", length = 128, nullable = false)
     private Integer recommend;
     //状态
-    @Column(name = "status", length = 128)
+    @Column(name = "status", length = 128, nullable = false)
     private String status;
     //创建时间
     @Column(name = "createTime", length = 128)
     private Date createTime;
     //创建人
-    @Column(name = "createUser", length = 128,nullable = false)
+    @Column(name = "createUser", length = 32, nullable = false)
     private String createUser;
     //更新时间
     @Column(name = "updateTime", length = 128)
