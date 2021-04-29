@@ -38,7 +38,7 @@ public interface AdminMapper {
     /**
      * 更新用户不合格商品数
      */
-    @Update("update t_user set unquaComm = unquaComm + 1 where userNo = #{item}, updateTime = now() and status = 'E'")
+    @Update("update t_user set unquaComm = unquaComm + 1, updateTime = now() where userNo = #{item} and status = 'E'")
     Integer updateUserUnquaComm(@Param("item") String userNo);
 
     /**

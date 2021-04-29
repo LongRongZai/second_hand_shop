@@ -20,7 +20,7 @@ public class CommOrderModel {
     //购买数量
     private Integer num;
     //价格
-    private Integer price;
+    private Double price;
     //订单状态(0 待发货(未发货),1 待收货(已发货),2 完成,3 申请取消,4 订单取消)
     private Integer orderStatus;
     //创建时间

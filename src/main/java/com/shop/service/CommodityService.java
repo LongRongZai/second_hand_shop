@@ -11,6 +11,7 @@ import com.shop.model.CommModel;
 import com.shop.model.PluploadModel;
 import com.shop.model.RandomCommListModel;
 import com.shop.model.ServiceRespModel;
+import com.shop.utils.ImageUtil;
 import com.shop.utils.UploadFileTool;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -104,7 +105,8 @@ public class CommodityService {
         if (evt.getCommTag() == null) {
             return new ServiceRespModel(-1, "商品标签不能为空", null);
         }
-        if (evt.getCommPrice() < 0) {
+        String price = evt.getCommPrice() + "";
+        if (evt.getCommPrice() < 0 && (price.length() - (price + "").indexOf(".") - 1) > 2) {
             return new ServiceRespModel(-1, "非法的商品价格", null);
         }
         if (evt.getCommStock() < 0) {
@@ -117,7 +119,7 @@ public class CommodityService {
             for (MultipartFile file : commPicList) {
                 String name = StringUtils.replace(file.getOriginalFilename(), " ", "");
                 String fileType = name.substring(name.lastIndexOf(".") + 1);
-                if (!(fileType.toLowerCase().equals("jpg") || fileType.toLowerCase().equals("jpeg") || fileType.toLowerCase().equals("png")))
+                if (!ImageUtil.isImage(fileType))
                     return new ServiceRespModel(-1, "仅支持图片格式上传", null);
             }
         }
@@ -136,6 +138,7 @@ public class CommodityService {
             if (commPicList != null) {
                 int flag = 0;
                 for (MultipartFile file : commPicList) {
+                    file = ImageUtil.compressFile(file, attachSavePath + file.getOriginalFilename(), 0.2f);
                     PluploadModel pluploadModel = UploadFileTool.upload(file, attachSavePath, attachViewPath);
                     CommPicBean addCommPic = new CommPicBean();
                     addCommPic.setCommPicNo(StringUtils.replace(UUID.randomUUID().toString(), "-", ""));

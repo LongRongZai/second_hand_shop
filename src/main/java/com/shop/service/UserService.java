@@ -4,6 +4,7 @@ import com.shop.bean.UserBean;
 import com.shop.dao.mapperDao.UserMapper;
 import com.shop.evt.*;
 import com.shop.model.*;
+import com.shop.utils.ImageUtil;
 import com.shop.utils.JwtUtils;
 import com.shop.utils.Md5Util;
 import com.shop.utils.UploadFileTool;
@@ -72,6 +73,8 @@ public class UserService {
         // 检验入参合法性
         if (StringUtils.isBlank(evt.getUserName()))
             return new ServiceRespModel(-1, "昵称不能为空", null);
+        if (evt.getUserName().length() > 20)
+            return new ServiceRespModel(-1, "昵称长度不能超过20", null);
         if (StringUtils.isBlank(evt.getUserEmail()))
             return new ServiceRespModel(-1, "邮箱不能为空", null);
         if (StringUtils.isBlank(evt.getUserPassword()))
@@ -185,7 +188,7 @@ public class UserService {
         if (profile != null) {
             String name = StringUtils.replace(profile.getOriginalFilename(), " ", "");
             String fileType = name.substring(name.lastIndexOf(".") + 1);
-            if (!(fileType.toLowerCase().equals("jpg") || fileType.toLowerCase().equals("jpeg") || fileType.toLowerCase().equals("png")))
+            if (!ImageUtil.isImage(fileType))
                 return new ServiceRespModel(-1, "仅支持图片格式上传", null);
             PluploadModel pluploadModel = UploadFileTool.upload(profile, attachSavePath, attachViewPath);
             model.setProfileUrl(pluploadModel.getViewPath());

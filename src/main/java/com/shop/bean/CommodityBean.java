@@ -27,7 +27,7 @@ public class CommodityBean {
     private String commDesc;
     //商品价格
     @Column(name = "commPrice", length = 128, nullable = false)
-    private Integer commPrice;
+    private Double commPrice;
     //商品销量
     @Column(name = "commSale", length = 128)
     private Integer commSale;

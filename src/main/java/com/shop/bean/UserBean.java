@@ -50,7 +50,7 @@ public class UserBean {
     @Column(name = "userRoot", length = 128, nullable = false)
     private Integer userRoot;
     //余额
-    @Column(name = "balance", length = 128, nullable = false)
+    @Column(name = "balance", length = 128)
     private long balance;
     //认证状态(0 未认证, 1 认证中, 2 认证通过 , 3 认证失败)
     @Column(name = "authentication", length = 128, nullable = false)

@@ -15,7 +15,7 @@ public class AdminCommModel {
     //商品描述
     private String commDesc;
     //商品价格
-    private Integer commPrice;
+    private Double commPrice;
     //商品销量
     private Integer commSale;
     //商品库存

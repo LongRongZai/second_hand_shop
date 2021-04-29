@@ -18,7 +18,7 @@ public class ReleaseCommEvt {
     private String commDesc;
     //商品价格
     @ApiModelProperty(value = "商品价格", required = true, example = "0")
-    private Integer commPrice;
+    private Double commPrice;
     //商品库存
     @ApiModelProperty(value = "商品库存", required = true, example = "0")
     private Integer commStock;

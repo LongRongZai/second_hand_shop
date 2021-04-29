@@ -14,8 +14,8 @@ public interface OrderMapper {
     /**
      * 提交订单
      */
-    @Insert("insert into t_order(orderNo, commNo, address, orderStatus, status, createTime, createUser, consignee, phone , num, price)values" +
-            "(#{item.orderNo}, #{item.commNo}, #{item.address}, 0, 'E', now(), #{item.createUser}, #{item.consignee}, #{item.phone}, #{item.num},#{item.price})")
+    @Insert("insert into t_order(orderNo, commNo, address, orderStatus, status, createTime, createUser, consignee, phone , num, price, deTimeFrom, deTimeTo)values" +
+            "(#{item.orderNo}, #{item.commNo}, #{item.address}, 0, 'E', now(), #{item.createUser}, #{item.consignee}, #{item.phone}, #{item.num},#{item.price},#{item.deTimeFrom},#{item.deTimeTo})")
     Integer submitOrder(@Param("item") OrderBean orderBean);
 
     /**

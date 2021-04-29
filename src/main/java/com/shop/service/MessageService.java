@@ -71,19 +71,21 @@ public class MessageService {
     @JmsListener(destination = "mail.send")
     public void sendEmailMsg(String json) {
         SendEmailModel model = JSONObject.parseObject(json, SendEmailModel.class);
-        //生成其他信息
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(sender);
-        message.setTo(model.getEmail());
-        message.setSubject("福大校园二手商城");// 标题
-        message.setText("【福大校园二手商城】 " + model.getMsg());// 内容
-        //发送邮件
         try {
+            //生成其他信息
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(sender);
+            message.setTo(model.getEmail());
+            message.setSubject("福大校园二手商城");// 标题
+            message.setText("【福大校园二手商城】 " + model.getMsg());// 内容
+            //发送邮件
             javaMailSender.send(message);
         } catch (MailSendException e) {
             logger.error("目标邮箱 " + model.getEmail() + " 不存在，邮件发送失败");
             throw new SendMailException("目标邮箱 " + model.getEmail() + " 不存在，邮件发送失败");
-
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("发送邮件系统异常");
         }
     }
 }

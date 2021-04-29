@@ -33,7 +33,13 @@ public class OrderBean {
     private Integer num;
     //价格
     @Column(name = "price", length = 128, nullable = false)
-    private Integer price;
+    private Double price;
+    //送达时间From
+    @Column(name = "deTimeFrom", length = 128, nullable = false)
+    private Date deTimeFrom;
+    //送达时间To
+    @Column(name = "deTimeTo", length = 128, nullable = false)
+    private Date deTimeTo;
     //订单状态(0 待发货(未发货),1 待收货(已发货),2 完成,3 申请取消,4 订单取消)
     @Column(name = "orderStatus", length = 128, nullable = false)
     private Integer orderStatus;

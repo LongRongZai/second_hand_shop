@@ -72,6 +72,8 @@ public class AdminService {
         if (commodityBean == null) {
             return new ServiceRespModel(-1, "商品不存在", null);
         }
+        //查询卖家
+        UserBean seller = userMapper.queryUserByNo(commodityBean.getCreateUser());
         try {
             //更新用户不合格商品数
             if (evt.getAuditStatus() == 2) {
@@ -80,7 +82,7 @@ public class AdminService {
                     throw new AuditCommException("更新用户不合格商品数失败");
                 }
                 SendEmailModel model = new SendEmailModel();
-                model.setEmail(userBean.getUserEmail());
+                model.setEmail(seller.getUserEmail());
                 model.setMsg(String.format("您发布的商品 %s 审核未通过，商品编码为 %s ，审核未通过原因：%s", commodityBean.getCommName(), evt.getCommNo(), evt.getAuditMsg()));
                 String json = JSON.toJSONString(model);
                 jmsProducer.sendMsg("mail.send", json);
@@ -129,20 +131,20 @@ public class AdminService {
             return new ServiceRespModel(-1, "封禁状态不能为空", null);
         }
         //校验用户权限
-        UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
-        if (userBean == null)
+        UserBean admin = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
+        if (admin == null)
             return new ServiceRespModel(-1, "用户不存在", null);
-        if (userBean.getUserRoot() != 1) {
+        if (admin.getUserRoot() != 1) {
             return new ServiceRespModel(-1, "无操作权限", null);
         }
-        //校验用户是否存在
+        //校验被操作用户是否存在
         UserBean user = userMapper.queryUserByNo(evt.getUserNo());
         if (user == null)
             return new ServiceRespModel(-1, "用户不存在", null);
         //发送邮件
         if (evt.getIsBan() == 1) {
             SendEmailModel model = new SendEmailModel();
-            model.setEmail(userBean.getUserEmail());
+            model.setEmail(user.getUserEmail());
             model.setMsg(String.format("您的账号因多次发布不合格商品已被封禁，您将不能发布商品与购买商品"));
             String json = JSON.toJSONString(model);
             jmsProducer.sendMsg("mail.send", json);
