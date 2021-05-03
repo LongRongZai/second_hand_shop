@@ -11,4 +11,5 @@ public class CommModel {
     private CommodityBean commodity;
     //商品图片列表
     private List<String> commPicList;
+
 }

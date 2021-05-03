@@ -76,7 +76,7 @@ public class OrderController {
      */
     @ApiOperation("更新订单状态接口")
     @RequestMapping(value = "/updateOrderStatus", method = RequestMethod.POST)
-    public ServiceRespModel updateOrderStatus(HttpServletRequest request, UpdateOrderStatusEvt evt) {
+    public ServiceRespModel updateOrderStatus(HttpServletRequest request,@ModelAttribute UpdateOrderStatusEvt evt) {
         try {
             return orderService.updateOrderStatus(request, evt);
         } catch (Exception e) {

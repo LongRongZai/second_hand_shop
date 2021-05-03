@@ -21,7 +21,7 @@ public class CollectBean {
     private String commNo;
     //收藏商品状态(0 正常, 1 失效)
     @Column(name = "collectStatus", length = 128, nullable = false)
-    private String collectStatus;
+    private Integer collectStatus;
     //状态
     @Column(name = "status", length = 128, nullable = false)
     private String status;

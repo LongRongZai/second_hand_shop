@@ -1,6 +1,7 @@
 package com.shop.controller;
 
 import com.shop.anotation.PassToken;
+import com.shop.evt.PageEvt;
 import com.shop.evt.ReleaseCommEvt;
 import com.shop.model.ServiceRespModel;
 import com.shop.service.CommodityService;
@@ -89,9 +90,9 @@ public class CommodityController {
     @ApiOperation("商品搜索接口")
     @ApiImplicitParam(name = "keyName", value = "搜索关键字", required = true)
     @RequestMapping(value = "/searchComm", method = RequestMethod.GET)
-    public ServiceRespModel searchComm(String keyName) {
+    public ServiceRespModel searchComm(String keyName, @ModelAttribute PageEvt evt) {
         try {
-            return commodityService.searchComm(keyName);
+            return commodityService.searchComm(keyName, evt);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("商品搜索功能异常");
@@ -158,9 +159,9 @@ public class CommodityController {
     @ApiOperation("商品标签分类接口")
     @ApiImplicitParam(name = "commTag", value = "商品标签", required = true)
     @RequestMapping(value = "/queryCommByTag", method = RequestMethod.GET)
-    public ServiceRespModel queryCommByTag(Integer commTag) {
+    public ServiceRespModel queryCommByTag(Integer commTag, @ModelAttribute PageEvt evt) {
         try {
-            return commodityService.queryCommByTag(commTag);
+            return commodityService.queryCommByTag(commTag, evt);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("商品标签分类功能异常");

@@ -1,16 +1,15 @@
 package com.shop.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shop.bean.CommPicBean;
 import com.shop.bean.CommodityBean;
 import com.shop.bean.UserBean;
 import com.shop.dao.mapperDao.CommodityMapper;
 import com.shop.dao.mapperDao.UserMapper;
+import com.shop.evt.PageEvt;
 import com.shop.evt.ReleaseCommEvt;
 import com.shop.exceptions.CommReleaseException;
-import com.shop.model.CommModel;
-import com.shop.model.PluploadModel;
-import com.shop.model.RandomCommListModel;
-import com.shop.model.ServiceRespModel;
+import com.shop.model.*;
 import com.shop.utils.ImageUtil;
 import com.shop.utils.UploadFileTool;
 import org.apache.commons.lang.StringUtils;
@@ -123,6 +122,7 @@ public class CommodityService {
                     return new ServiceRespModel(-1, "仅支持图片格式上传", null);
             }
         }
+
         //将商品信息存至数据库
         try {
             CommodityBean addComm = new CommodityBean();
@@ -135,6 +135,14 @@ public class CommodityService {
             addComm.setCommTag(evt.getCommTag());
             addComm.setCommSale(0);
             addComm.setCreateUser((String) request.getAttribute("userNo"));
+            addComm.setUserName(userBean.getUserName());
+            if (!evt.getCustomTags().isEmpty()) {
+                StringBuffer tags = new StringBuffer();
+                for (String tag : evt.getCustomTags()) {
+                    tags.append(tag + "_");
+                }
+                addComm.setCustomTags(tags.toString());
+            }
             if (commPicList != null) {
                 int flag = 0;
                 for (MultipartFile file : commPicList) {
@@ -170,15 +178,17 @@ public class CommodityService {
     /**
      * 商品搜索
      */
-    public ServiceRespModel searchComm(String keyName) {
+    public ServiceRespModel searchComm(String keyName, PageEvt evt) {
         //校验入参合法性
         if (StringUtils.isBlank(keyName)) {
             return new ServiceRespModel(-1, "搜索关键字不能为空", null);
         }
         //查询商品
-        List<CommodityBean> commodityBeanList = commodityMapper.queryCommByName(keyName);
-        List<CommModel> commModelList = queryCommPic(commodityBeanList);
-        return new ServiceRespModel(1, "商品列表", commModelList);
+        Page<CommodityBean> page = new Page<>(evt.getCurrent(), evt.getSize());
+        Page<CommodityBean> commodityBeanPage = commodityMapper.queryCommByName(page, keyName);
+        List<CommModel> commModelList = queryCommPic(commodityBeanPage.getRecords());
+        PageModel pageModel = new PageModel(commModelList, commodityBeanPage.getCurrent(), commodityBeanPage.getPages());
+        return new ServiceRespModel(1, "商品列表", pageModel);
     }
 
     /**
@@ -247,15 +257,17 @@ public class CommodityService {
     /**
      * 通过标签搜索商品
      */
-    public ServiceRespModel queryCommByTag(Integer commTag) {
+    public ServiceRespModel queryCommByTag(Integer commTag, PageEvt evt) {
         //校验入参合法性
         if (commTag == null) {
             return new ServiceRespModel(-1, "商品标签不能为空", null);
         }
         //查询商品
-        List<CommodityBean> commodityBeanList = commodityMapper.queryCommByTag(commTag);
-        List<CommModel> commModelList = queryCommPic(commodityBeanList);
-        return new ServiceRespModel(1, "商品列表", commModelList);
+        Page<CommodityBean> page = new Page<>(evt.getCurrent(), evt.getSize());
+        Page<CommodityBean> commodityBeanPage = commodityMapper.queryCommByTag(page, commTag);
+        List<CommModel> commModelList = queryCommPic(commodityBeanPage.getRecords());
+        PageModel pageModel = new PageModel(commModelList, commodityBeanPage.getCurrent(), commodityBeanPage.getPages());
+        return new ServiceRespModel(1, "商品列表", pageModel);
     }
 
     /**

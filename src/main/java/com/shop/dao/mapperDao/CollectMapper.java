@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface CollectMapper {
 
     //插入商品
-    @Insert("insert into t_collect(collectNo, commNo, createUser, createTime, status, collectStatus)values" +
-            "(#{model.collectNo}, #{model.commNo}, #{model.createUser}, now(), 'E', 0)")
+    @Insert("insert into t_collect(collectNo, commNo, createUser, status, collectStatus)values" +
+            "(#{model.collectNo}, #{model.commNo}, #{model.createUser}, 'E', 0)")
     Integer insertComm(@Param("model")InsertCollectCommModel model);
 }

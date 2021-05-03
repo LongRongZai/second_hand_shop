@@ -175,7 +175,7 @@ public class OrderService {
         if (orderBean == null) {
             return new ServiceRespModel(-1, "订单不存在", null);
         }
-        CommodityBean commodityBean = commodityMapper.queryCommByNo(orderBean.getCommNo());
+        CommodityBean commodityBean = commodityMapper.queryCommByNoUnlimited(orderBean.getCommNo());
         if (commodityBean == null) {
             return new ServiceRespModel(-1, "商品不存在", null);
         }

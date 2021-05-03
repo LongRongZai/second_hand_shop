@@ -1,9 +1,6 @@
 package com.shop.controller;
 
-import com.shop.evt.AuditAuthenticationEvt;
-import com.shop.evt.AuditCommEvt;
-import com.shop.evt.SetCommRecEvt;
-import com.shop.evt.SetUserIsBanEvt;
+import com.shop.evt.*;
 import com.shop.model.ServiceRespModel;
 import com.shop.service.AdminService;
 import io.swagger.annotations.Api;
@@ -33,7 +30,7 @@ public class AdminController {
      */
     @ApiOperation("商品审核接口")
     @RequestMapping(value = "/auditComm", method = RequestMethod.POST)
-    public ServiceRespModel auditComm(HttpServletRequest request, AuditCommEvt evt) {
+    public ServiceRespModel auditComm(HttpServletRequest request, @ModelAttribute AuditCommEvt evt) {
         try {
             return adminService.auditComm(request, evt);
         } catch (Exception e) {
@@ -48,9 +45,9 @@ public class AdminController {
      */
     @ApiOperation("查看全部商品接口")
     @RequestMapping(value = "/commList", method = RequestMethod.GET)
-    public ServiceRespModel commList(HttpServletRequest request) {
+    public ServiceRespModel commList(HttpServletRequest request, @ModelAttribute PageEvt evt) {
         try {
-            return adminService.commList(request);
+            return adminService.commList(request, evt);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("查看全部商品功能异常");
@@ -63,7 +60,7 @@ public class AdminController {
      */
     @ApiOperation("设置用户封禁状态接口")
     @RequestMapping(value = "/setUserIsBan", method = RequestMethod.POST)
-    public ServiceRespModel setUserIsBan(HttpServletRequest request, SetUserIsBanEvt evt) {
+    public ServiceRespModel setUserIsBan(HttpServletRequest request, @ModelAttribute SetUserIsBanEvt evt) {
         try {
             return adminService.setUserIsBan(request, evt);
         } catch (Exception e) {
@@ -78,9 +75,9 @@ public class AdminController {
      */
     @ApiOperation("查看全部用户接口")
     @RequestMapping(value = "/userList", method = RequestMethod.POST)
-    public ServiceRespModel userList(HttpServletRequest request) {
+    public ServiceRespModel userList(HttpServletRequest request, @ModelAttribute PageEvt evt) {
         try {
-            return adminService.userList(request);
+            return adminService.userList(request, evt);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("查看全部用户功能异常");

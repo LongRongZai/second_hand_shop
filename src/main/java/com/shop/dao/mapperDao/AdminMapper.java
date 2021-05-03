@@ -1,16 +1,15 @@
 package com.shop.dao.mapperDao;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.shop.bean.CommodityBean;
 import com.shop.bean.UserBean;
 import com.shop.evt.AuditCommEvt;
 import com.shop.evt.SetCommRecEvt;
-import com.shop.model.AdminCommModel;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Mapper
 @Repository
@@ -25,15 +24,15 @@ public interface AdminMapper {
     /**
      * 全部商品列表
      */
-    @Select("select c.*, u.userName from t_commodity c left join t_user u on c.createUser = u.userNo where c.status = 'E' and u.status = 'E'")
-    List<AdminCommModel> commList();
+    @Select("select * from t_commodity where status = 'E'")
+    Page<CommodityBean> commList(Page<CommodityBean> commodityBeanPage);
 
 
     /**
      * 全部用户列表
      */
     @Select("select * from t_user where status = 'E'")
-    List<UserBean> userList();
+    Page<UserBean> userList(Page<UserBean> userBeanPage);
 
     /**
      * 更新用户不合格商品数

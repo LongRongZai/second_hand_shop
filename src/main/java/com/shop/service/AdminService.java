@@ -1,21 +1,16 @@
 package com.shop.service;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shop.async.JmsProducer;
 import com.shop.bean.CommodityBean;
 import com.shop.bean.UserBean;
 import com.shop.dao.mapperDao.AdminMapper;
 import com.shop.dao.mapperDao.CommodityMapper;
 import com.shop.dao.mapperDao.UserMapper;
-import com.shop.evt.AuditAuthenticationEvt;
-import com.shop.evt.AuditCommEvt;
-import com.shop.evt.SetCommRecEvt;
-import com.shop.evt.SetUserIsBanEvt;
+import com.shop.evt.*;
 import com.shop.exceptions.AuditCommException;
-import com.shop.model.AdminCommModel;
-import com.shop.model.SendEmailModel;
-import com.shop.model.ServiceRespModel;
-import com.shop.model.UpdateUserModel;
+import com.shop.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +21,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -103,7 +99,7 @@ public class AdminService {
     /**
      * 查看全部商品
      */
-    public ServiceRespModel commList(HttpServletRequest request) {
+    public ServiceRespModel commList(HttpServletRequest request, PageEvt evt) {
         //校验用户权限
         UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
         if (userBean == null)
@@ -112,11 +108,11 @@ public class AdminService {
             return new ServiceRespModel(-1, "无操作权限", null);
         }
         //返回全部商品列表
-        List<AdminCommModel> adminCommModelList = adminMapper.commList();
-        for (AdminCommModel adminCommModel : adminCommModelList) {
-            adminCommModel.setCommPicList(commodityMapper.queryPicByCommNo(adminCommModel.getCommNo()));
-        }
-        return new ServiceRespModel(1, "全部商品列表", adminCommModelList);
+        Page<CommodityBean> page = new Page<>(evt.getCurrent(), evt.getSize());
+        Page<CommodityBean> commodityBeanPage = adminMapper.commList(page);
+        List<CommModel> commModelList = queryCommPic(commodityBeanPage.getRecords());
+        PageModel pageModel = new PageModel(commModelList, commodityBeanPage.getCurrent(), commodityBeanPage.getPages());
+        return new ServiceRespModel(1, "全部商品列表", pageModel);
     }
 
     /**
@@ -164,7 +160,7 @@ public class AdminService {
     /**
      * 全部用户列表
      */
-    public ServiceRespModel userList(HttpServletRequest request) {
+    public ServiceRespModel userList(HttpServletRequest request, PageEvt evt) {
         //校验用户权限
         UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
         if (userBean == null)
@@ -172,7 +168,10 @@ public class AdminService {
         if (userBean.getUserRoot() != 1) {
             return new ServiceRespModel(-1, "无操作权限", null);
         }
-        return new ServiceRespModel(1, "全部用户列表", adminMapper.userList());
+        Page<UserBean> page = new Page<>(evt.getCurrent(), evt.getSize());
+        Page<UserBean> userBeanPage = adminMapper.userList(page);
+        PageModel pageModel = new PageModel(userBeanPage.getRecords(), userBeanPage.getCurrent(), userBeanPage.getPages());
+        return new ServiceRespModel(1, "全部用户列表", pageModel);
     }
 
     /**
@@ -237,5 +236,17 @@ public class AdminService {
             return new ServiceRespModel(1, "设置商品推荐成功", null);
         }
         return new ServiceRespModel(-1, "设置商品推荐失败", null);
+    }
+
+    //查询商品对应图片
+    private List<CommModel> queryCommPic(List<CommodityBean> commodityBeanList) {
+        List<CommModel> commModelList = new ArrayList<>();
+        for (CommodityBean commodityBean : commodityBeanList) {
+            CommModel model = new CommModel();
+            model.setCommPicList(commodityMapper.queryPicByCommNo(commodityBean.getCommNo()));
+            model.setCommodity(commodityBean);
+            commModelList.add(model);
+        }
+        return commModelList;
     }
 }

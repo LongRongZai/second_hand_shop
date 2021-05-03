@@ -19,6 +19,9 @@ public class CommodityBean {
     //商品名称
     @Column(name = "commName", length = 128, nullable = false)
     private String commName;
+    //商家名称
+    @Column(name = "userName", length = 128, nullable = false)
+    private String userName;
     //商品标签(0 衣物,1 数码,2 食品,3 图书,4 化妆品,5 文具,6 居家)
     @Column(name = "commTag", length = 128, nullable = false)
     private Integer commTag;
@@ -37,6 +40,9 @@ public class CommodityBean {
     //推荐(0 未推荐, 1 推荐)
     @Column(name = "recommend", length = 128, nullable = false)
     private Integer recommend;
+    //自定义标签
+    @Column(name = "customTags", length = 256)
+    private String customTags;
     //状态
     @Column(name = "status", length = 128, nullable = false)
     private String status;

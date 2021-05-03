@@ -1,5 +1,6 @@
 package com.shop.dao.mapperDao;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shop.bean.CommPicBean;
 import com.shop.bean.CommodityBean;
 import com.shop.dao.provider.CommodityProvider;
@@ -29,15 +30,16 @@ public interface CommodityMapper {
     /**
      * 发布商品
      */
-    @Insert("insert into t_commodity(commNo,commName,commTag,commDesc,commPrice,commSale,commStock,status,createTime,createUser,auditStatus,recommend)values" +
-            "(#{item.commNo},#{item.commName},#{item.commTag},#{item.commDesc},#{item.commPrice},#{item.commSale},#{item.commStock},'E',now(),#{item.createUser},0,0)")
+    @Insert("insert into t_commodity(commNo,commName,commTag,commDesc,commPrice,commSale,commStock,status,createTime,createUser,auditStatus,recommend,customTags,userName)values" +
+            "(#{item.commNo},#{item.commName},#{item.commTag},#{item.commDesc},#{item.commPrice},#{item.commSale},#{item.commStock},'E',now(),#{item.createUser},0,0,#{item.customTags},#{item.userName})")
     Integer releaseComm(@Param("item") CommodityBean commodityBean);
 
     /**
      * 商品搜索
      */
-    @Select("select * from t_commodity where status = 'E' and auditStatus = 1 and commName like CONCAT('%',#{item},'%')")
-    List<CommodityBean> queryCommByName(@Param("item") String keyName);
+    @Select("select * from t_commodity where status = 'E' and auditStatus = 1 and (commName like CONCAT('%',#{item},'%') or customTags like CONCAT('%',#{item},'%'))")
+    Page<CommodityBean> queryCommByName(Page<CommodityBean> commodityBeanPage, @Param("item") String keyName);
+
 
     /**
      * 商品预搜索
@@ -50,6 +52,12 @@ public interface CommodityMapper {
      */
     @Select("select * from t_commodity where status = 'E' and commNo = #{item}")
     CommodityBean queryCommByNo(@Param("item") String commNo);
+
+    /**
+     * 查看商品(无限制）
+     */
+    @Select("select * from t_commodity where and commNo = #{item}")
+    CommodityBean queryCommByNoUnlimited(@Param("item") String commNo);
 
     /**
      * 插入商品图片
@@ -68,7 +76,7 @@ public interface CommodityMapper {
      * 通过标签搜索商品
      */
     @Select("select * from t_commodity where status = 'E' and auditStatus = 1 and commTag = #{item}")
-    List<CommodityBean> queryCommByTag(@Param("item") Integer commTag);
+    Page<CommodityBean> queryCommByTag(Page<CommodityBean> commodityBeanPage, @Param("item") Integer commTag);
 
     /**
      * 查看用户发布的商品

@@ -4,6 +4,8 @@ package com.shop.evt;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ReleaseCommEvt {
 
@@ -22,5 +24,8 @@ public class ReleaseCommEvt {
     //商品库存
     @ApiModelProperty(value = "商品库存", required = true, example = "0")
     private Integer commStock;
+    //自定义标签
+    @ApiModelProperty(value = "自定义标签")
+    private List<String> customTags;
 
 }
