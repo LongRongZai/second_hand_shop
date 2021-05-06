@@ -61,9 +61,12 @@ public class UserBean {
     //学院
     @Column(name = "college", length = 128)
     private String college;
-    //认证照片地址
-    @Column(name = "photoUrl", length = 128)
-    private String photoUrl;
+    //认证照片1
+    @Column(name = "photoUrl1", length = 128)
+    private String photoUrl1;
+    //认证照片2
+    @Column(name = "photoUrl2", length = 128)
+    private String photoUrl2;
     //最近登录时间
     @Column(name = "lastLoginTime", length = 128)
     private Date lastLoginTime;

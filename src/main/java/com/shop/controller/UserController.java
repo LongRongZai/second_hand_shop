@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -125,7 +126,7 @@ public class UserController {
      */
     @ApiOperation("更新认证信息接口")
     @RequestMapping(value = "/uploadAuthenticationInfo", method = RequestMethod.POST)
-    public ServiceRespModel updateAuthenticationInfo(@ModelAttribute UpdateAuthenticationInfoEvt evt, MultipartFile photo, HttpServletRequest request) {
+    public ServiceRespModel updateAuthenticationInfo(UpdateAuthenticationInfoEvt evt, List<MultipartFile> photo, HttpServletRequest request) {
         try {
             return userService.updateAuthenticationInfo(evt, photo, request);
         } catch (Exception e) {

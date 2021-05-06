@@ -34,8 +34,11 @@ public class UserProvider {
                 if (StringUtils.isNotBlank(model.getSno())) {
                     SET("sno = #{sno}");
                 }
-                if (StringUtils.isNotBlank(model.getPhotoUrl())) {
-                    SET("photoUrl = #{photoUrl}");
+                if (StringUtils.isNotBlank(model.getPhotoUrl1())) {
+                    SET("photoUrl1 = #{photoUrl1}");
+                }
+                if (StringUtils.isNotBlank(model.getPhotoUrl2())) {
+                    SET("photoUrl2 = #{photoUrl2}");
                 }
                 if (model.getAuthentication() != null) {
                     SET("authentication = #{authentication}");

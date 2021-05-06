@@ -99,7 +99,7 @@ public class AdminService {
     /**
      * 查看全部商品
      */
-    public ServiceRespModel commList(HttpServletRequest request, PageEvt evt,Integer auditStatus) {
+    public ServiceRespModel commList(HttpServletRequest request, PageEvt evt, Integer auditStatus) {
         //校验用户权限
         UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
         if (userBean == null)
@@ -109,7 +109,7 @@ public class AdminService {
         }
         //返回全部商品列表
         Page<CommodityBean> page = new Page<>(evt.getCurrent(), evt.getSize());
-        Page<CommodityBean> commodityBeanPage = adminMapper.commList(page,auditStatus);
+        Page<CommodityBean> commodityBeanPage = adminMapper.commList(page, auditStatus);
         List<CommModel> commModelList = queryCommPic(commodityBeanPage.getRecords());
         PageModel pageModel = new PageModel(commModelList, commodityBeanPage.getCurrent(), commodityBeanPage.getPages());
         return new ServiceRespModel(1, "全部商品列表", pageModel);
@@ -168,9 +168,18 @@ public class AdminService {
         if (userBean.getUserRoot() != 1) {
             return new ServiceRespModel(-1, "无操作权限", null);
         }
+        //分页查询
         Page<UserBean> page = new Page<>(evt.getCurrent(), evt.getSize());
         Page<UserBean> userBeanPage = adminMapper.userList(page);
-        PageModel pageModel = new PageModel(userBeanPage.getRecords(), userBeanPage.getCurrent(), userBeanPage.getPages());
+        List<AdminUserListModel> models = new ArrayList<>();
+        for (UserBean user : userBeanPage.getRecords()) {
+            AdminUserListModel model = new AdminUserListModel();
+            model.setUserBean(user);
+            model.getPhotoList().add(user.getPhotoUrl1());
+            model.getPhotoList().add(user.getPhotoUrl2());
+            models.add(model);
+        }
+        PageModel pageModel = new PageModel(models, userBeanPage.getCurrent(), userBeanPage.getPages());
         return new ServiceRespModel(1, "全部用户列表", pageModel);
     }
 

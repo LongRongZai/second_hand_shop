@@ -22,8 +22,10 @@ public class UpdateUserModel {
     private String sno;
     //学院
     private String college;
-    //学生证图片地址
-    private String photoUrl;
+    //认证照片地址1
+    private String photoUrl1;
+    //认证照片地址2
+    private String photoUrl2;
     //认证状态
     private Integer authentication;
     //用户封禁状态

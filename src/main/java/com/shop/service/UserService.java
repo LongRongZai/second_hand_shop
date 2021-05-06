@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -224,7 +225,7 @@ public class UserService {
     /**
      * 更新认证信息
      */
-    public ServiceRespModel updateAuthenticationInfo(UpdateAuthenticationInfoEvt evt, MultipartFile profile, HttpServletRequest request) throws Exception {
+    public ServiceRespModel updateAuthenticationInfo(UpdateAuthenticationInfoEvt evt, List<MultipartFile> photo, HttpServletRequest request) throws Exception {
         // 检验入参合法性
         if (StringUtils.isBlank(evt.getUserRealName()))
             return new ServiceRespModel(-1, "用户真实姓名不能为空", null);
@@ -232,16 +233,24 @@ public class UserService {
             return new ServiceRespModel(-1, "学号不能为空", null);
         if (StringUtils.isBlank(evt.getSno()))
             return new ServiceRespModel(-1, "学院不能为空", null);
+        if (photo == null || photo.size() > 2)
+            return new ServiceRespModel(-1, "照片数量不合法", null);
         //上传图片
-        String name = StringUtils.replace(profile.getOriginalFilename(), " ", "");
-        String fileType = name.substring(name.lastIndexOf(".") + 1);
-        if (!(fileType.toLowerCase().equals("jpg") || fileType.toLowerCase().equals("jpeg") || fileType.toLowerCase().equals("png")))
-            return new ServiceRespModel(-1, "仅支持图片格式上传", null);
-        PluploadModel pluploadModel = UploadFileTool.upload(profile, shopProperties.getAttachSavePath(), shopProperties.getAttachViewPath());
-        //将认证信息保存至数据库
         UpdateUserModel model = new UpdateUserModel();
+        for (int a = 0; a < photo.size(); a++) {
+            String name = StringUtils.replace(photo.get(a).getOriginalFilename(), " ", "");
+            String fileType = name.substring(name.lastIndexOf(".") + 1);
+            if (!ImageUtil.isImage(fileType))
+                return new ServiceRespModel(-1, "仅支持图片格式上传", null);
+            PluploadModel pluploadModel = UploadFileTool.upload(photo.get(a), shopProperties.getAttachSavePath(), shopProperties.getAttachViewPath());
+            if (a == 1) {
+                model.setPhotoUrl1(pluploadModel.getViewPath());
+            } else {
+                model.setPhotoUrl2(pluploadModel.getViewPath());
+            }
+        }
+        //将认证信息保存至数据库
         model.setUserNo((String) request.getAttribute("userNo"));
-        model.setPhotoUrl(pluploadModel.getViewPath());
         model.setUserRealName(evt.getUserRealName());
         model.setCollege(evt.getCollege());
         model.setSno(evt.getSno());
