@@ -1,9 +1,13 @@
 package com.shop.service;
 
 import com.shop.bean.UserBean;
+import com.shop.config.ShopProperties;
 import com.shop.dao.mapperDao.UserMapper;
 import com.shop.evt.*;
-import com.shop.model.*;
+import com.shop.model.PluploadModel;
+import com.shop.model.ServiceRespModel;
+import com.shop.model.UpdateUserModel;
+import com.shop.model.UserLoginModel;
 import com.shop.utils.ImageUtil;
 import com.shop.utils.JwtUtils;
 import com.shop.utils.Md5Util;
@@ -11,7 +15,7 @@ import com.shop.utils.UploadFileTool;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,11 +29,8 @@ public class UserService {
     @Resource
     private UserMapper userMapper;
 
-    @Value("${shop.attach.save.path}")
-    private String attachSavePath;
-
-    @Value("${shop.attach.view.path}")
-    private String attachViewPath;
+    @Autowired
+    private ShopProperties shopProperties;
 
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -140,7 +141,7 @@ public class UserService {
             return new ServiceRespModel(-1, "密码错误", null);
         }
         //更新密码
-        int info = userMapper.changePassword(evt.getNewPassword(), (String) request.getAttribute("userNo"));
+        int info = userMapper.changePassword(Md5Util.MD5(evt.getNewPassword()), (String) request.getAttribute("userNo"));
         if (info == 1) {
             return new ServiceRespModel(1, "密码修改成功", null);
         }
@@ -190,7 +191,7 @@ public class UserService {
             String fileType = name.substring(name.lastIndexOf(".") + 1);
             if (!ImageUtil.isImage(fileType))
                 return new ServiceRespModel(-1, "仅支持图片格式上传", null);
-            PluploadModel pluploadModel = UploadFileTool.upload(profile, attachSavePath, attachViewPath);
+            PluploadModel pluploadModel = UploadFileTool.upload(profile, shopProperties.getAttachSavePath(), shopProperties.getAttachViewPath());
             model.setProfileUrl(pluploadModel.getViewPath());
             flag++;
         }
@@ -236,7 +237,7 @@ public class UserService {
         String fileType = name.substring(name.lastIndexOf(".") + 1);
         if (!(fileType.toLowerCase().equals("jpg") || fileType.toLowerCase().equals("jpeg") || fileType.toLowerCase().equals("png")))
             return new ServiceRespModel(-1, "仅支持图片格式上传", null);
-        PluploadModel pluploadModel = UploadFileTool.upload(profile, attachSavePath, attachViewPath);
+        PluploadModel pluploadModel = UploadFileTool.upload(profile, shopProperties.getAttachSavePath(), shopProperties.getAttachViewPath());
         //将认证信息保存至数据库
         UpdateUserModel model = new UpdateUserModel();
         model.setUserNo((String) request.getAttribute("userNo"));

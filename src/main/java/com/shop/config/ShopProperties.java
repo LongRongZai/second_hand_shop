@@ -11,7 +11,7 @@ public class ShopProperties {
     //无需验证的路由
     private List<String> loginInterceptorExcludePath;
     //附件保存地址
-    private String uploadSavePath;
+    private String attachSavePath;
     //附件预览地址
-    private String uploadViewPath;
+    private String attachViewPath;
 }

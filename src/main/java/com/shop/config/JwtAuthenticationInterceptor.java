@@ -1,9 +1,10 @@
-package com.shop.utils;
+package com.shop.config;
 
 import com.shop.anotation.PassToken;
 import com.shop.bean.UserBean;
 import com.shop.dao.mapperDao.UserMapper;
 import com.shop.exceptions.TokenUnavailableException;
+import com.shop.utils.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
@@ -46,7 +47,6 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
         else {
             // 执行认证
             if (token == null) {
-                logger.error("需要令牌进行验证");
                 httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
             }

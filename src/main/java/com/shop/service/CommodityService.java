@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shop.bean.CommPicBean;
 import com.shop.bean.CommodityBean;
 import com.shop.bean.UserBean;
+import com.shop.config.ShopProperties;
 import com.shop.dao.mapperDao.CommodityMapper;
 import com.shop.dao.mapperDao.UserMapper;
 import com.shop.evt.PageEvt;
@@ -15,7 +16,7 @@ import com.shop.utils.UploadFileTool;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -36,11 +37,8 @@ public class CommodityService {
     @Resource
     private UserMapper userMapper;
 
-    @Value("${shop.attach.save.path}")
-    private String attachSavePath;
-
-    @Value("${shop.attach.view.path}")
-    private String attachViewPath;
+    @Autowired
+    private ShopProperties shopProperties;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -146,8 +144,8 @@ public class CommodityService {
             if (commPicList != null) {
                 int flag = 0;
                 for (MultipartFile file : commPicList) {
-                    file = ImageUtil.compressFile(file, attachSavePath + file.getOriginalFilename(), 0.2f);
-                    PluploadModel pluploadModel = UploadFileTool.upload(file, attachSavePath, attachViewPath);
+                    file = ImageUtil.compressFile(file, shopProperties.getAttachSavePath() + file.getOriginalFilename(), 0.2f);
+                    PluploadModel pluploadModel = UploadFileTool.upload(file, shopProperties.getAttachSavePath(), shopProperties.getAttachViewPath());
                     CommPicBean addCommPic = new CommPicBean();
                     addCommPic.setCommPicNo(StringUtils.replace(UUID.randomUUID().toString(), "-", ""));
                     addCommPic.setCommNo(commNo);

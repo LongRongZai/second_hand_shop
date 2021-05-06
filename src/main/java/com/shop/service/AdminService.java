@@ -99,7 +99,7 @@ public class AdminService {
     /**
      * 查看全部商品
      */
-    public ServiceRespModel commList(HttpServletRequest request, PageEvt evt) {
+    public ServiceRespModel commList(HttpServletRequest request, PageEvt evt,Integer auditStatus) {
         //校验用户权限
         UserBean userBean = userMapper.queryUserByNo((String) request.getAttribute("userNo"));
         if (userBean == null)
@@ -109,7 +109,7 @@ public class AdminService {
         }
         //返回全部商品列表
         Page<CommodityBean> page = new Page<>(evt.getCurrent(), evt.getSize());
-        Page<CommodityBean> commodityBeanPage = adminMapper.commList(page);
+        Page<CommodityBean> commodityBeanPage = adminMapper.commList(page,auditStatus);
         List<CommModel> commModelList = queryCommPic(commodityBeanPage.getRecords());
         PageModel pageModel = new PageModel(commModelList, commodityBeanPage.getCurrent(), commodityBeanPage.getPages());
         return new ServiceRespModel(1, "全部商品列表", pageModel);

@@ -26,7 +26,7 @@ public interface UserMapper {
     /**
      * 插入用户
      */
-    @Insert("insert into t_user(userNO,createTime,status,userEmail,userName,userPassword,isBan,userRoot,unquaComm,authentication)values" +
+    @Insert("insert into t_user(userNo,createTime,status,userEmail,userName,userPassword,isBan,userRoot,unquaComm,authentication)values" +
             "(#{item.userNo},now(),'E',#{item.userEmail},#{item.userName},#{item.userPassword},0,0,0,0)")
     Integer insertUser(@Param("item") UserBean userBean);
 

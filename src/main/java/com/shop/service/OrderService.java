@@ -79,9 +79,6 @@ public class OrderService {
         if (userBean.getIsBan() == 1) {
             return new ServiceRespModel(-1, "用户处于封禁状态", null);
         }
-        if (userBean.getAuthentication() != 2) {
-            return new ServiceRespModel(2, "用户认证未通过", null);
-        }
         //校验卖家是否存在
         UserBean saleUserBean = userMapper.queryUserByNo(comm.getCreateUser());
         if (saleUserBean == null) {

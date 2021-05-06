@@ -4,6 +4,7 @@ import com.shop.evt.*;
 import com.shop.model.ServiceRespModel;
 import com.shop.service.AdminService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +46,10 @@ public class AdminController {
      */
     @ApiOperation("查看全部商品接口")
     @RequestMapping(value = "/commList", method = RequestMethod.GET)
-    public ServiceRespModel commList(HttpServletRequest request, @ModelAttribute PageEvt evt) {
+    @ApiImplicitParam(name = "auditStatus", value = "审核状态", example = "0", dataType = "int")
+    public ServiceRespModel commList(HttpServletRequest request, @ModelAttribute PageEvt evt, Integer auditStatus) {
         try {
-            return adminService.commList(request, evt);
+            return adminService.commList(request, evt, auditStatus);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("查看全部商品功能异常");

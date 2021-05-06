@@ -9,7 +9,6 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.shop.bean.UserBean;
 import com.shop.exceptions.TokenUnavailableException;
-import com.shop.model.LoginModel;
 
 import java.util.Calendar;
 import java.util.Date;

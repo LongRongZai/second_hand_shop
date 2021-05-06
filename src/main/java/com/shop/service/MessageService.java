@@ -52,7 +52,7 @@ public class MessageService {
         String code = VerificationCode.generateCode(4);   //随机数生成4位验证码
         SendEmailModel model = new SendEmailModel();
         model.setEmail(email);
-        model.setMsg("【福大校园二手商城】您的验证码为：" + code + " 有效期为5分钟");
+        model.setMsg("您的验证码为：" + code + " 有效期为5分钟");
         //发送邮件
         String json = JSON.toJSONString(model);
         jmsProducer.sendMsg("mail.send", json);

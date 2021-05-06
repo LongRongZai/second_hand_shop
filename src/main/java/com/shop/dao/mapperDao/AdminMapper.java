@@ -3,12 +3,10 @@ package com.shop.dao.mapperDao;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.shop.bean.CommodityBean;
 import com.shop.bean.UserBean;
+import com.shop.dao.provider.AdminProvider;
 import com.shop.evt.AuditCommEvt;
 import com.shop.evt.SetCommRecEvt;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 @Mapper
@@ -24,8 +22,8 @@ public interface AdminMapper {
     /**
      * 全部商品列表
      */
-    @Select("select * from t_commodity where status = 'E'")
-    Page<CommodityBean> commList(Page<CommodityBean> commodityBeanPage);
+    @SelectProvider(type = AdminProvider.class, method = "commList")
+    Page<CommodityBean> commList(Page<CommodityBean> commodityBeanPage, Integer auditStatus);
 
 
     /**
