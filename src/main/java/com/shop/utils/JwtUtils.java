@@ -38,7 +38,7 @@ public class JwtUtils {
                 .withClaim("userName", userBean.getUserName())    //载荷，随便写几个都可以
                 .withClaim("userNo", userBean.getUserNo())
                 .withClaim("userEmail", userBean.getUserEmail())
-                .sign(Algorithm.HMAC256(userBean.getUserNo() + "LongRongZai"));   //加密
+                .sign(Algorithm.HMAC256(userBean.getUserNo() + "L"));   //加密
     }
 
     /**
@@ -47,7 +47,7 @@ public class JwtUtils {
     public static void verifyToken(String token, String secret) throws TokenUnavailableException {
         DecodedJWT jwt = null;
         try {
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret + "LongRongZai")).build();
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret + "L")).build();
             jwt = verifier.verify(token);
         } catch (Exception e) {
             //效验失败

@@ -23,7 +23,7 @@ public interface AdminMapper {
      * 全部商品列表
      */
     @SelectProvider(type = AdminProvider.class, method = "commList")
-    Page<CommodityBean> commList(Page<CommodityBean> commodityBeanPage, Integer auditStatus);
+    Page<CommodityBean> commList(@Param("commodityBeanPage") Page<CommodityBean> commodityBeanPage, @Param("auditStatus") Integer auditStatus);
 
 
     /**

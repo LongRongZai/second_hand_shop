@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -67,7 +68,7 @@ public class OrderService {
         }
         //查询商品是否存在
         CommodityBean comm = commodityMapper.queryCommByNo(evt.getCommNo());
-        if (comm == null) {
+        if (comm == null || comm.getAuditStatus() != 1) {
             return new ServiceRespModel(-1, "商品不存在", null);
         }
         //校验购买数量合法性
@@ -90,22 +91,24 @@ public class OrderService {
 //            return new ServiceRespModel(-1, "用户余额不足", null);
 //        }
         //提交订单
-        OrderBean orderBean = new OrderBean();
-        orderBean.setOrderNo(StringUtils.replace(UUID.randomUUID().toString(), "-", ""));
-        orderBean.setCommNo(evt.getCommNo());
-        orderBean.setAddress(evt.getAddress());
-        orderBean.setConsignee(evt.getConsignee());
-        orderBean.setCreateUser((String) request.getAttribute("userNo"));
-        orderBean.setNum(evt.getNum());
-        orderBean.setPhone(evt.getPhone());
-        orderBean.setPrice(price);
-        orderBean.setDeTimeFrom(evt.getDeTimeFrom());
-        orderBean.setDeTimeTo(evt.getDeTimeTo());
-        int info = orderMapper.submitOrder(orderBean);
-        if (info != 1) {
 
-            throw new OrderSystemException("订单信息提交至数据库失败");
-        }
+        OrderBean orderBean = null;
+        try {
+            orderBean = new OrderBean();
+            orderBean.setOrderNo(StringUtils.replace(UUID.randomUUID().toString(), "-", ""));
+            orderBean.setCommNo(evt.getCommNo());
+            orderBean.setAddress(evt.getAddress());
+            orderBean.setConsignee(evt.getConsignee());
+            orderBean.setCreateUser((String) request.getAttribute("userNo"));
+            orderBean.setNum(evt.getNum());
+            orderBean.setPhone(evt.getPhone());
+            orderBean.setPrice(price);
+            orderBean.setDeTimeFrom(evt.getDeTimeFrom());
+            orderBean.setDeTimeTo(evt.getDeTimeTo());
+            int info = orderMapper.submitOrder(orderBean);
+            if (info != 1) {
+                throw new OrderSystemException("订单信息提交至数据库失败");
+            }
 //            //扣除金额与增加金额
 //            int info1 = userMapper.updateUserBalance(-price, (String) request.getAttribute("userNo"));
 //            if (info1 != 1) {
@@ -115,10 +118,15 @@ public class OrderService {
 //            if (info2 != 1) {
 //                throw new UpdateUserBalanceException("增加用户金额失败");
 //            }
-        //更新商品销量与库存
-        int info3 = commodityMapper.updateCommSaleAndStock(evt.getNum(), evt.getCommNo());
-        if (info3 != 1) {
-            throw new OrderSystemException("更新商品销量与库存失败");
+            //更新商品销量与库存
+            int info3 = commodityMapper.updateCommSaleAndStock(evt.getNum(), evt.getCommNo());
+            if (info3 != 1) {
+                throw new OrderSystemException("更新商品销量与库存失败");
+            }
+        } catch (OrderSystemException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            e.printStackTrace();
+            return new ServiceRespModel(-1, e.getMessage(), null);
         }
         //发送邮件
         SendEmailModel model = new SendEmailModel();

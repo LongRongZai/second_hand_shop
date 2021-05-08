@@ -29,31 +29,31 @@ public class OrderBean {
     @Column(name = "phone", length = 128, nullable = false)
     private String phone;
     //购买数量
-    @Column(name = "num", length = 128, nullable = false)
+    @Column(name = "num", nullable = false)
     private Integer num;
     //价格
-    @Column(name = "price", length = 128, nullable = false)
+    @Column(name = "price", nullable = false)
     private Double price;
     //送达时间From
-    @Column(name = "deTimeFrom", length = 128, nullable = false)
+    @Column(name = "deTimeFrom", nullable = false)
     private Date deTimeFrom;
     //送达时间To
-    @Column(name = "deTimeTo", length = 128, nullable = false)
+    @Column(name = "deTimeTo", nullable = false)
     private Date deTimeTo;
     //订单状态(0 待发货(未发货),1 待收货(已发货),2 完成,3 申请取消,4 订单取消)
-    @Column(name = "orderStatus", length = 128, nullable = false)
+    @Column(name = "orderStatus", nullable = false)
     private Integer orderStatus;
     //状态
     @Column(name = "status", length = 128, nullable = false)
     private String status;
     //创建时间
-    @Column(name = "createTime", length = 128)
+    @Column(name = "createTime")
     private Date createTime;
     //创建人
     @Column(name = "createUser", length = 128, nullable = false)
     private String createUser;
     //更新时间
-    @Column(name = "updateTime", length = 128)
+    @Column(name = "updateTime")
     private Date updateTime;
     //更新人员
     @Column(name = "updateUser", length = 128)

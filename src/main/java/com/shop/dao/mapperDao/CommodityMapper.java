@@ -56,7 +56,7 @@ public interface CommodityMapper {
     /**
      * 查看商品(无限制）
      */
-    @Select("select * from t_commodity where and commNo = #{item}")
+    @Select("select * from t_commodity where commNo = #{item}")
     CommodityBean queryCommByNoUnlimited(@Param("item") String commNo);
 
     /**
@@ -69,7 +69,7 @@ public interface CommodityMapper {
     /**
      * 删除商品
      */
-    @Update("update t_commodity c left join t_commPic cp on c.commNo = cp.commNo set c.status = 'D', cp.status = 'D', c.updateTime = now(), cp.updateTime = now() where c.commNo = #{item} and c.status = 'E' and cp.status = 'E'")
+    @Update("update t_commodity set status = 'D', updateTime = now() where commNo = #{item} and status = 'E' ")
     Integer deleteComm(@Param("item") String commNo);
 
     /**

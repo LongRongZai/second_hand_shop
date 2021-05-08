@@ -134,7 +134,7 @@ public class CommodityService {
             addComm.setCommSale(0);
             addComm.setCreateUser((String) request.getAttribute("userNo"));
             addComm.setUserName(userBean.getUserName());
-            if (!evt.getCustomTags().isEmpty()) {
+            if (evt.getCustomTags() != null) {
                 StringBuffer tags = new StringBuffer();
                 for (String tag : evt.getCustomTags()) {
                     tags.append(tag + "_");

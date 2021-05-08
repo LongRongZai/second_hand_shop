@@ -31,6 +31,10 @@ public class CommOrderModel {
     private String commName;
     //商品描述
     private String commDesc;
+    //送达时间From
+    private Date deTimeFrom;
+    //送达时间To
+    private Date deTimeTo;
     //商品图片列表
     private List<String> commPicList;
 }
